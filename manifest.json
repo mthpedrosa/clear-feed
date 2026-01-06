@@ -2,6 +2,7 @@
     "manifest_version": 3,
     "name": "ClearFeed: Blocker de Reels e Shorts",
     "version": "1.0",
+    "description":"Bloqueia Reels no Instagram, Shorts no YouTube e vídeos sugeridos no Facebook para uma experiência de navegação mais limpa.",
     "action": {
       "default_popup": "popup.html",
       "default_icon": "icon.png"
