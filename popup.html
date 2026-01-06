@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    /* Estilo para simular fonte de jogo retrô */
+    @font-face {
+        font-family: 'Press Start 2P';
+        src: url('https://fonts.gstatic.com/s/pressstart2p/v14/nW0x9jYPcFVE5GHhWp-SQF_BM3M5wTMQ-2O0.woff2') format('woff2');
+        /* Para usar esta fonte, teríamos que baixar o arquivo ou usar um serviço como o Google Fonts.
+           Para manter a extensão offline e simples, vou usar uma fonte genérica pixelada.
+           Se você quiser, pode baixar "Press Start 2P" e colocar na pasta!
+        */
+    }
+
+    body {
+      width: 250px; /* Um pouco mais largo para a imagem */
+      font-family: 'Press Start 2P', 'Courier New', monospace; /* Fonte pixelada */
+      text-align: center;
+      padding: 15px;
+      background-color: #333; /* Fundo escuro de jogo */
+      color: #eee; /* Texto claro */
+      border: 2px solid #555; /* Borda de "janela de jogo" */
+      box-shadow: 4px 4px #111; /* Sombra para dar profundidade */
+    }
+    img {
+      width: 100%; /* A imagem vai ocupar todo o espaço do popup */
+      max-width: 200px; /* Limita o tamanho para não ficar gigante */
+      image-rendering: pixelated; /* Deixa a imagem nítida com pixels */
+      margin-bottom: 15px;
+      border: 2px solid #555;
+      padding: 5px;
+      background-color: #000;
+    }
+    h2 {
+      font-size: 18px;
+      color: #ffe000; /* Cor amarela de destaque */
+      margin: 5px 0 10px;
+      text-shadow: 2px 2px #ff0000; /* Sombra vermelha para efeito de jogo */
+    }
+    p {
+      font-size: 14px;
+      color: #00ff00; /* Cor verde de "sucesso" */
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+    .status-message {
+      font-size: 12px;
+      color: #aaa;
+      border-top: 1px dashed #555;
+      padding-top: 10px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <img src="icon.png" alt="Herói venceu os Reels!">
+  <h2>CLEAR FEED QUEST</h2>
+  <p>STATUS: ATIVO E PRONTO PARA A BATALHA!</p>
+  <div class="status-message">
+    Seu guerreiro está bloqueando Reels e Shorts automaticamente.
+    Nenhum vídeo curto passará!
+  </div>
+</body>
+</html>
