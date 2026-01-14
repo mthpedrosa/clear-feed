@@ -1,8 +1,11 @@
 {
     "manifest_version": 3,
-    "name": "ClearFeed: Blocker de Reels e Shorts",
-    "version": "1.0",
-    "description": "Bloqueia Reels no Instagram, Shorts no YouTube e vídeos sugeridos no Facebook para uma experiência de navegação mais limpa.",
+    "name": "NoReels - Remove Reels and Shorts",
+    "version": "1.1",
+    "description": "Automatically remove Reels and Shorts from YouTube, Instagram, and Facebook.",
+    "icons": {
+        "128": "images/icon.png"
+    },
     "action": {
         "default_popup": "popup.html",
         "default_icon": "images/icon.png"
@@ -18,5 +21,8 @@
                 "content.js"
             ]
         }
+    ],
+    "permissions": [
+        "storage"
     ]
 }

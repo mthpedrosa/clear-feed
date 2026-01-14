@@ -1,88 +1,119 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="UTF-8">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-
     body {
-      width: 250px;
-      font-family: 'Press Start 2P', cursive;
+      width: 200px;
+      font-family: 'Fredoka', sans-serif;
       text-align: center;
       padding: 20px;
-      background-color: #1a1a1a;
-      color: #eee;
-      border: 4px solid #444;
-    }
-
-    .icon-container {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 20px;
-    }
-
-    img {
-      width: 80px;
-      height: 80px;
-      image-rendering: pixelated;
-      border: 3px solid #00ff00;
-      padding: 5px;
-      background-color: #000;
-    }
-
-    .status-box {
-      border: 2px solid #555;
-      padding: 10px;
-      margin-bottom: 20px;
-      background-color: #222;
-    }
-
-    .status-text {
-      font-size: 10px;
-      color: #00ff00;
-      line-height: 1.5;
+      background-color: #ffffff;
+      color: #333;
       margin: 0;
     }
 
-    .btn-linkedin {
+    .icon {
+      width: 50px;
+      height: 50px;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-size: 18px;
+      margin: 0 0 20px 0;
+      font-weight: 600;
+      color: #222;
+    }
+
+    .switch {
+      position: relative;
       display: inline-block;
-      background-color: #0077b5;
-      color: white;
-      text-decoration: none;
-      font-size: 8px;
-      padding: 12px;
-      border: none;
-      border-bottom: 4px solid #004a73;
+      width: 50px;
+      height: 26px;
+      margin-bottom: 20px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
       cursor: pointer;
-      transition: all 0.1s;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 34px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked+.slider {
+      background-color: #000;
+      /* Preto minimalista para Ativado */
+    }
+
+    input:checked+.slider:before {
+      transform: translateX(24px);
+    }
+
+    .status-text {
+      font-size: 12px;
+      font-weight: 400;
+      color: #888;
+      margin-top: -10px;
+      margin-bottom: 20px;
+    }
+
+    .btn-linkedin {
+      display: block;
+      color: #0077b5;
+      text-decoration: none;
+      font-size: 11px;
+      font-weight: 600;
+      transition: opacity 0.2s;
     }
 
     .btn-linkedin:hover {
-      background-color: #008cdc;
-      transform: translateY(2px);
-      border-bottom-width: 2px;
-    }
-
-    .btn-linkedin:active {
-      transform: translateY(4px);
-      border-bottom: none;
+      opacity: 0.7;
     }
   </style>
 </head>
+
 <body>
 
-  <div class="icon-container">
-    <img src="images/icon.png" alt="Icon">
-  </div>
+  <img src="images/icon.png" class="icon" alt="NoReels">
+  <h2>NoReels</h2>
 
-  <div class="status-box">
-    <p class="status-text">● SISTEMA ATIVO</p>
-    <p class="status-text" style="font-size: 8px; color: #aaa; margin-top: 5px;">FUNCIONANDO</p>
-  </div>
+  <label class="switch">
+    <input type="checkbox" id="toggleBlock" checked>
+    <span class="slider"></span>
+  </label>
 
-  <a href="https://www.linkedin.com/in/matheus-pedrosa-custodio/" target="_blank" class="btn-linkedin">
-    LINKEDIN
-  </a>
+  <p id="statusLabel" class="status-text">Blocking Active</p>
 
+  <a href="https://www.linkedin.com/in/matheus-pedrosa-custodio/" target="_blank" class="btn-linkedin">Developer
+    Profile</a>
+
+  <script src="popup.js"></script>
 </body>
+
 </html>
