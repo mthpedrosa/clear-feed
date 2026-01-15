@@ -1,28 +1,23 @@
 {
     "manifest_version": 3,
     "name": "NoReels - Remove Reels and Shorts",
-    "version": "1.1",
-    "description": "Automatically remove Reels and Shorts from YouTube, Instagram, and Facebook.",
+    "version": "1.2",
+    "description": "Permanently remove Reels and Shorts from YouTube, Instagram, and Facebook.",
     "icons": {
-        "128": "images/icon.png"
+      "128": "images/icon.png"
     },
     "action": {
-        "default_popup": "popup.html",
-        "default_icon": "images/icon.png"
+      "default_popup": "popup.html"
     },
     "content_scripts": [
-        {
-            "matches": [
-                "*://*.youtube.com/*",
-                "*://*.facebook.com/*",
-                "*://*.instagram.com/*"
-            ],
-            "js": [
-                "content.js"
-            ]
-        }
-    ],
-    "permissions": [
-        "storage"
+      {
+        "matches": [
+          "*://*.youtube.com/*",
+          "*://*.facebook.com/*",
+          "*://*.instagram.com/*"
+        ],
+        "js": ["content.js"],
+        "run_at": "document_start"
+      }
     ]
-}
+  }
