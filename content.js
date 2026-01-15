@@ -3,8 +3,9 @@ const removerLixo = () => {
   const ytSelectors = [
     "ytd-rich-section-renderer",
     "ytd-reel-shelf-renderer",
-    "ytd-guide-entry-renderer:has(a[title='Shorts'])",
-    "a[title='Shorts']"
+    "grid-shelf-view-model",
+    "ytd-video-renderer:has(a[href^='/shorts/'])",
+    "ytd-grid-video-renderer:has(a[href^='/shorts/'])",
   ];
 
   // instagram
