@@ -1,33 +1,27 @@
 const injectStyles = () => {
-  if (document.getElementById('noreels-logic-styles')) return;
+  if (document.getElementById('noreels-fix-styles')) return;
 
   const style = document.createElement('style');
-  style.id = 'noreels-logic-styles';
+  style.id = 'noreels-fix-styles';
   style.innerHTML = `
-    /* YOUTUBE - Esconde prateleiras de Shorts sem quebrar o feed */
+    /* YOUTUBE: Vídeos e Prateleiras */
     ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[is-shorts]),
     ytd-reel-shelf-renderer,
     grid-shelf-view-model,
     ytd-video-renderer:has(a[href^='/shorts/']),
+    [is-shorts],
+
+    /* YOUTUBE: Botões da Barra Lateral (O que causou a rejeição) */
     ytd-guide-entry-renderer:has(a[href="/shorts/"]),
     ytd-mini-guide-entry-renderer:has(a[href="/shorts/"]),
-    #shorts-container,
-    ytd-reel-video-renderer {
-      display: none !important;
-    }
+    #endpoint:has(tp-yt-paper-item [title="Shorts"]),
+    a[title="Shorts"],
 
-    /* INSTAGRAM - Esconde apenas os botões e seções de Reels */
+    /* INSTAGRAM & FACEBOOK */
     a[href^='/reels/'], 
     a[href*='/reel/'], 
     svg[aria-label*='Reels'],
-    span:has(> svg[aria-label*='Reels']) {
-      display: none !important;
-    }
-
-    /* FACEBOOK - Esconde blocos de Reels no Feed */
-    div[aria-label="Reels"], 
-    div[id*="reels_tab"],
-    div:has(> h2 span:contains("Reels")) {
+    div[aria-label="Reels"] {
       display: none !important;
     }
   `;
@@ -37,9 +31,8 @@ const injectStyles = () => {
 injectStyles();
 
 const observer = new MutationObserver(() => {
-  if (!document.getElementById('noreels-logic-styles')) {
+  if (!document.getElementById('noreels-fix-styles')) {
     injectStyles();
   }
 });
-
 observer.observe(document.documentElement, { childList: true, subtree: true });

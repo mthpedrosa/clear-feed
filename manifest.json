@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "NoReels - Remove Reels and Shorts",
-    "version": "1.2",
+    "version": "1.2.1",
     "description": "Permanently remove Reels and Shorts from YouTube, Instagram, and Facebook.",
     "icons": {
       "128": "images/icon.png"
