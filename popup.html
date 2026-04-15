@@ -1,26 +1,272 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="UTF-8">
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
-      width: 180px;
+      width: 250px;
       font-family: 'Fredoka', sans-serif;
-      text-align: center;
-      padding: 20px;
+      padding: 15px;
       background-color: #ffffff;
+      margin: 0;
     }
-    .icon { width: 50px; height: 50px; }
-    h2 { font-size: 18px; margin: 10px 0; color: #000; }
-    .status { color: #28a745; font-size: 12px; font-weight: 600; }
-    .dev { display: block; margin-top: 15px; font-size: 10px; color: #0077b5; text-decoration: none; }
+
+    .header {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .header img {
+      width: 40px;
+      height: 40px;
+    }
+
+    h2 {
+      font-size: 18px;
+      margin: 5px 0;
+      color: #333;
+    }
+
+    .section {
+      border-top: 1px solid #eee;
+      padding: 12px 0;
+    }
+
+    .section-title {
+      font-weight: 600;
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .control-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: #444;
+      margin-bottom: 5px;
+    }
+
+    /* Switch Style */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 34px;
+      height: 20px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 20px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 14px;
+      width: 14px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked+.slider {
+      background-color: #2196F3;
+    }
+
+    input:checked+.slider:before {
+      transform: translateX(14px);
+    }
+
+    .metrics {
+      background: #f8f9fa;
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-around;
+      font-size: 12px;
+    }
+
+    .metric-value {
+      font-weight: 600;
+      color: #2196F3;
+    }
+
+    .dev {
+      display: block;
+      text-align: center;
+      margin-top: 15px;
+      font-size: 10px;
+      color: #999;
+      text-decoration: none;
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 15px;
+      box-sizing: border-box;
+    }
+    .modal-content {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      width: 100%;
+    }
+    .modal-text {
+      font-size: 13px;
+      color: #333;
+      margin-bottom: 15px;
+      line-height: 1.4;
+    }
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+    .btn {
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      flex: 1;
+    }
+    .btn-yes {
+      background: #2196F3;
+      color: white;
+    }
+    .btn-no {
+      background: #f1f1f1;
+      color: #666;
+    }
   </style>
 </head>
+
 <body>
-  <img src="images/icon.png" class="icon">
-  <h2>NoReels</h2>
-  <p class="status">● Active & Focused</p>
-  <a href="https://www.linkedin.com/in/matheus-pedrosa-custodio/" target="_blank" class="dev">Developer Profile</a>
+  <div class="header">
+    <img src="images/icon.png">
+    <h2>NoReels</h2>
+  </div>
+
+  <!-- YouTube Section -->
+  <div class="section">
+    <div class="section-title">YouTube</div>
+    <div class="control-item">
+      <span>Block Shorts</span>
+      <label class="switch">
+        <input type="checkbox" id="yt-shorts" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="control-item">
+      <span>Hide Comments</span>
+      <label class="switch">
+        <input type="checkbox" id="yt-comments" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="control-item">
+      <span>Home Recommendations</span>
+      <label class="switch">
+        <input type="checkbox" id="yt-home" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="control-item">
+      <span>Video Recommendations</span>
+      <label class="switch">
+        <input type="checkbox" id="yt-video-rec" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Instagram Section -->
+  <div class="section">
+    <div class="section-title">Instagram</div>
+    <div class="control-item">
+      <span>Block Reels</span>
+      <label class="switch">
+        <input type="checkbox" id="ig-reels" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Facebook Section -->
+  <div class="section">
+    <div class="section-title">Facebook</div>
+    <div class="control-item">
+      <span>Block Reels</span>
+      <label class="switch">
+        <input type="checkbox" id="fb-reels" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="control-item">
+      <span>Block Stories</span>
+      <label class="switch">
+        <input type="checkbox" id="fb-stories" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <div class="metrics">
+    <div>Blocked: <span id="total-blocked" class="metric-value">0</span></div>
+    <div>Saved: <span id="time-saved" class="metric-value">0m</span></div>
+  </div>
+
+  <a href="https://www.linkedin.com/in/matheus-pedrosa-custodio/" target="_blank" class="dev">Developed by Matheus Pedrosa</a>
+
+  <!-- Custom Modal -->
+  <div id="custom-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div id="modal-text" class="modal-text"></div>
+      <div class="modal-buttons">
+        <button id="modal-btn-yes" class="btn btn-yes"></button>
+        <button id="modal-btn-no" class="btn btn-no"></button>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
 </body>
+
 </html>
