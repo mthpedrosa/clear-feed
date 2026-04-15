@@ -4,5 +4,17 @@
     },
     "appDesc": {
         "message": "Reclaim your focus. Permanently block Shorts and Reels on YouTube, Instagram, and Facebook."
+    },
+    "profileSuggestion": {
+        "message": "Welcome to NoReels! Since it's your first time using the extension, would you like to check out the developer's LinkedIn profile?"
+    },
+    "rateSuggestion": {
+        "message": "You've been using NoReels for a few days! Would you like to rate our extension to help us grow?"
+    },
+    "btnYes": {
+        "message": "Yes"
+    },
+    "btnNo": {
+        "message": "No, thanks"
     }
 }
