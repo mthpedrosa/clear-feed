@@ -1,0 +1,24 @@
+{
+    "appName": {
+        "message": "NoReels - Удалить YouTube Shorts и Instagram Reels"
+    },
+    "appDesc": {
+        "message": "Верните концентрацию. Навсегда заблокируйте Shorts и Reels на YouTube, Instagram и Facebook."
+    },
+    "profileSuggestion": {
+        "message": "Добро пожаловать в NoReels! Так как вы используете расширение впервые, не хотите ли вы посетить профиль разработчика в LinkedIn?"
+    },
+    "rateSuggestion": {
+        "message": "Вы пользуетесь NoReels уже несколько дней! Не хотите ли вы оценить наше расширение, чтобы помочь нам расти?"
+    },
+    "btnYes": {
+        "message": "Да"
+    },
+    "btnNo": {
+        "message": "Нет, спасибо"
+    }
+    ,
+    "affiliateMessage": {
+        "message": "Нравится NoReels? Поддержите проект, купив любой товар на Amazon по этой ссылке!"
+    }
+}

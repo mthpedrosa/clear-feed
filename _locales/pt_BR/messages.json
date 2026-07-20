@@ -16,5 +16,8 @@
     },
     "btnNo": {
         "message": "Não, obrigado"
+    },
+    "affiliateMessage": {
+        "message": "Gosta do NoReels? Apoie o projeto comprando qualquer item na Amazon por este link!"
     }
 }

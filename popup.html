@@ -123,57 +123,21 @@
       text-decoration: none;
     }
 
-    /* Modal Styles */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.6);
-      z-index: 100;
-      align-items: center;
-      justify-content: center;
-      padding: 15px;
-      box-sizing: border-box;
-    }
-    .modal-content {
-      background: white;
-      padding: 15px;
-      border-radius: 8px;
+    .affiliate-message {
+      display: block;
       text-align: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      width: 100%;
-    }
-    .modal-text {
-      font-size: 13px;
-      color: #333;
-      margin-bottom: 15px;
-      line-height: 1.4;
-    }
-    .modal-buttons {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-    }
-    .btn {
-      border: none;
-      padding: 8px 12px;
-      border-radius: 4px;
-      font-size: 12px;
-      cursor: pointer;
-      font-family: inherit;
-      font-weight: 600;
-      flex: 1;
-    }
-    .btn-yes {
-      background: #2196F3;
-      color: white;
-    }
-    .btn-no {
-      background: #f1f1f1;
+      margin-top: 10px;
+      font-size: 11px;
       color: #666;
+      background: #fff8e1;
+      padding: 8px;
+      border-radius: 6px;
+      text-decoration: none;
+      border: 1px solid #ffe082;
+    }
+
+    .affiliate-message:hover {
+      background: #ffecb3;
     }
   </style>
 </head>
@@ -253,18 +217,12 @@
     <div>Saved: <span id="time-saved" class="metric-value">0m</span></div>
   </div>
 
-  <a href="https://www.linkedin.com/in/matheus-pedrosa-custodio/" target="_blank" class="dev">Developed by Matheus Pedrosa</a>
+  <!-- Support Affiliate Message -->
+  <a href="https://amzn.to/3Q2wrRr" target="_blank" class="affiliate-message">
+    __MSG_affiliateMessage__
+  </a>
 
-  <!-- Custom Modal -->
-  <div id="custom-modal" class="modal-overlay">
-    <div class="modal-content">
-      <div id="modal-text" class="modal-text"></div>
-      <div class="modal-buttons">
-        <button id="modal-btn-yes" class="btn btn-yes"></button>
-        <button id="modal-btn-no" class="btn btn-no"></button>
-      </div>
-    </div>
-  </div>
+  <a href="https://www.linkedin.com/in/matheus-pedrosa-custodio/" target="_blank" class="dev">Developed by Matheus Pedrosa</a>
 
   <script src="popup.js"></script>
 </body>

@@ -49,12 +49,16 @@ const SELECTORS = {
 
 let currentConfig = {
   blockYoutubeShorts: true,
-  blockYoutubeComments: true,
-  blockYoutubeHome: true,
-  blockYoutubeVideoRec: true,
+  blockYoutubeComments: false,
+  blockYoutubeHome: false,
+  blockYoutubeVideoRec: false,
   blockInstagramReels: true,
   blockFacebookReels: true,
-  blockFacebookStories: true
+  blockFacebookStories: false,
+  focusScheduleEnabled: false,
+  focusStartTime: "09:00",
+  focusEndTime: "17:00",
+  isPaidUser: false
 };
 
 const getPlatform = () => {
@@ -63,6 +67,26 @@ const getPlatform = () => {
   if (host.includes('instagram.com')) return 'instagram';
   if (host.includes('facebook.com')) return 'facebook';
   return null;
+};
+
+const isWithinFocusSchedule = () => {
+  if (!currentConfig.isPaidUser || !currentConfig.focusScheduleEnabled) return true; // Default behavior
+
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+  const [startH, startM] = (currentConfig.focusStartTime || "09:00").split(':').map(Number);
+  const startMinutes = startH * 60 + startM;
+
+  const [endH, endM] = (currentConfig.focusEndTime || "17:00").split(':').map(Number);
+  const endMinutes = endH * 60 + endM;
+
+  if (startMinutes <= endMinutes) {
+    return currentMinutes >= startMinutes && currentMinutes <= endMinutes;
+  } else {
+    // Crosses midnight
+    return currentMinutes >= startMinutes || currentMinutes <= endMinutes;
+  }
 };
 
 const injectStyles = () => {
@@ -75,31 +99,33 @@ const injectStyles = () => {
   const activeSelectors = [];
   let customCSS = '';
 
-  if (platform === 'youtube') {
-    if (currentConfig.blockYoutubeShorts) activeSelectors.push(...SELECTORS.youtube.shorts);
-    if (currentConfig.blockYoutubeComments) activeSelectors.push(...SELECTORS.youtube.comments);
-    if (currentConfig.blockYoutubeHome) activeSelectors.push(...SELECTORS.youtube.home);
-    if (currentConfig.blockYoutubeVideoRec) {
-      activeSelectors.push(...SELECTORS.youtube.videoRec);
-      customCSS += `
-        #primary.ytd-watch-flexy {
-          max-width: 100% !important;
-          margin-left: auto !important;
-          margin-right: auto !important;
-          padding-right: 0 !important;
-        }
-        ytd-watch-flexy[flexy] #primary.ytd-watch-flexy {
-          margin-left: auto !important;
-          margin-right: auto !important;
-        }
-        #columns { justify-content: center !important; }
-      `;
+  if (isWithinFocusSchedule()) {
+    if (platform === 'youtube') {
+      if (currentConfig.blockYoutubeShorts) activeSelectors.push(...SELECTORS.youtube.shorts);
+      if (currentConfig.blockYoutubeComments) activeSelectors.push(...SELECTORS.youtube.comments);
+      if (currentConfig.blockYoutubeHome) activeSelectors.push(...SELECTORS.youtube.home);
+      if (currentConfig.blockYoutubeVideoRec) {
+        activeSelectors.push(...SELECTORS.youtube.videoRec);
+        customCSS += `
+          #primary.ytd-watch-flexy {
+            max-width: 100% !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            padding-right: 0 !important;
+          }
+          ytd-watch-flexy[flexy] #primary.ytd-watch-flexy {
+            margin-left: auto !important;
+            margin-right: auto !important;
+          }
+          #columns { justify-content: center !important; }
+        `;
+      }
+    } else if (platform === 'instagram') {
+      if (currentConfig.blockInstagramReels) activeSelectors.push(...SELECTORS.instagram.reels);
+    } else if (platform === 'facebook') {
+      if (currentConfig.blockFacebookReels) activeSelectors.push(...SELECTORS.facebook.reels);
+      if (currentConfig.blockFacebookStories) activeSelectors.push(...SELECTORS.facebook.stories);
     }
-  } else if (platform === 'instagram') {
-    if (currentConfig.blockInstagramReels) activeSelectors.push(...SELECTORS.instagram.reels);
-  } else if (platform === 'facebook') {
-    if (currentConfig.blockFacebookReels) activeSelectors.push(...SELECTORS.facebook.reels);
-    if (currentConfig.blockFacebookStories) activeSelectors.push(...SELECTORS.facebook.stories);
   }
 
   const style = document.createElement('style');
@@ -159,12 +185,12 @@ const loadConfig = () => {
   ], (result) => {
     currentConfig = {
       blockYoutubeShorts: result.blockYoutubeShorts !== false,
-      blockYoutubeComments: result.blockYoutubeComments !== false,
-      blockYoutubeHome: result.blockYoutubeHome !== false,
-      blockYoutubeVideoRec: result.blockYoutubeVideoRec !== false,
+      blockYoutubeComments: result.blockYoutubeComments === true,
+      blockYoutubeHome: result.blockYoutubeHome === true,
+      blockYoutubeVideoRec: result.blockYoutubeVideoRec === true,
       blockInstagramReels: result.blockInstagramReels !== false,
       blockFacebookReels: result.blockFacebookReels !== false,
-      blockFacebookStories: result.blockFacebookStories !== false
+      blockFacebookStories: result.blockFacebookStories === true
     };
     injectStyles();
     processBlocks();
