@@ -1,0 +1,23 @@
+{
+    "appName": {
+        "message": "NoReels - Eliminar YouTube Shorts e Instagram Reels"
+    },
+    "appDesc": {
+        "message": "Recupera tu enfoque. Bloquea permanentemente Shorts y Reels en YouTube, Instagram y Facebook."
+    },
+    "profileSuggestion": {
+        "message": "¡Bienvenido a NoReels! Dado que es tu primera vez usando la extensión, ¿te gustaría ver el perfil de LinkedIn del desarrollador?"
+    },
+    "rateSuggestion": {
+        "message": "¡Has estado usando NoReels durante unos días! ¿Te gustaría calificar nuestra extensión para ayudarnos a crecer?"
+    },
+    "btnYes": {
+        "message": "Sí"
+    },
+    "btnNo": {
+        "message": "No, gracias"
+    },
+    "affiliateMessage": {
+        "message": "¿Te gusta NoReels? ¡Apoya el proyecto comprando cualquier producto en Amazon a través de este enlace!"
+    }
+}
