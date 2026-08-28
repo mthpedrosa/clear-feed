@@ -1,0 +1,44 @@
+name: Release & Chrome Web Store Upload
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Publish automatically to Chrome Web Store (true/false)'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  build-and-publish:
+    name: Package and Publish Extension
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Package Extension ZIP
+        run: |
+          zip -r clear-feed.zip . -x "*.git*" "*.github*" "GEMINI.md" "*.DS_Store"
+          echo "ZIP created successfully:"
+          unzip -l clear-feed.zip
+
+      - name: Upload Zip to GitHub Release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: clear-feed.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload to Chrome Web Store
+        uses: mnao305/chrome-extension-upload-action@v2
+        with:
+          file_path: 'clear-feed.zip'
+          extension_id: ${{ secrets.CHROME_EXTENSION_ID }}
+          client_id: ${{ secrets.CHROME_CLIENT_ID }}
+          client_secret: ${{ secrets.CHROME_CLIENT_SECRET }}
+          refresh_token: ${{ secrets.CHROME_REFRESH_TOKEN }}
+          publish: ${{ inputs.publish || false }}

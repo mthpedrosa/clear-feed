@@ -33,6 +33,9 @@
 
 ```text
 clear-feed/
+├── .github/
+│   └── workflows/
+│       └── release.yml     # Automated Chrome Web Store release workflow
 ├── _locales/               # Multi-language translations
 │   ├── en/messages.json    # English translations
 │   ├── es/messages.json    # Spanish translations
@@ -72,11 +75,20 @@ To load the extension into your browser manually:
 5. Select the root directory containing this project (`clear-feed`).
 6. Pin the extension to your toolbar to open the settings panel anytime!
 
-### Production Packaging
+### Automated Release & Chrome Web Store Publishing
 
-To compile or submit to the Chrome Web Store:
-1. Zip the root directory.
-2. Exclude development-only files or folders (e.g., `.git`, `.gitignore`, `GEMINI.md`).
+Releases are automatically packaged and published to the **Chrome Web Store** using GitHub Actions whenever a new release is published on GitHub.
+
+#### Configuring GitHub Repository Secrets
+
+Navigate to **Settings > Secrets and variables > Actions** in your GitHub repository and add:
+
+- `CHROME_EXTENSION_ID`: Your Chrome Web Store extension Item ID.
+- `CHROME_CLIENT_ID`: Google Cloud API OAuth2 Client ID.
+- `CHROME_CLIENT_SECRET`: Google Cloud API OAuth2 Client Secret.
+- `CHROME_REFRESH_TOKEN`: Google Cloud API OAuth2 Refresh Token.
+
+> 🔒 **Security Note**: Repository Secrets are encrypted and remain private. They are never exposed in public repositories, pull requests, or workflow logs.
 
 ---
 
