@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Manifest V3](https://img.shields.io/badge/Chrome_Extension-Manifest_V3-blue.svg)](https://developer.chrome.com/docs/extensions/mv3/intro/)
 [![Vanilla JS](https://img.shields.io/badge/JavaScript-Vanilla-orange.svg)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
-[![Multi-language](https://img.shields.io/badge/Languages-EN%20%7C%20PT--BR%20%7C%20RU-green.svg)](#internationalization)
+[![Multi-language](https://img.shields.io/badge/Languages-EN%20%7C%20ES%20%7C%20PT--BR%20%7C%20RU-green.svg)](#internationalization)
 
 **NoReels** is a lightweight, zero-dependency browser extension built on Manifest V3. Designed to reclaim your focus and increase productivity, it blocks distracting short-form content and recommendations across popular social media platforms.
 
@@ -25,7 +25,7 @@
 - **Productivity Metrics**:
   - Track the number of items blocked.
   - View estimated saved time directly from the popup.
-- **Multi-language Support (i18n)**: Automatically translates options to English, Portuguese (BR), and Russian based on browser preferences.
+- **Multi-language Support (i18n)**: Automatically translates options to English, Spanish, Portuguese (BR), and Russian based on browser preferences.
 
 ---
 
@@ -35,6 +35,7 @@
 clear-feed/
 ├── _locales/               # Multi-language translations
 │   ├── en/messages.json    # English translations
+│   ├── es/messages.json    # Spanish translations
 │   ├── pt_BR/messages.json # Portuguese (Brazilian) translations
 │   └── ru/messages.json    # Russian translations
 ├── images/                 # Extension asset assets
