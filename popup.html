@@ -6,59 +6,149 @@
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
-      width: 250px;
+      width: 280px;
       font-family: 'Fredoka', sans-serif;
-      padding: 15px;
+      padding: 14px;
       background-color: #ffffff;
       margin: 0;
+      color: #333;
     }
 
     .header {
-      text-align: center;
-      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .header img {
-      width: 40px;
-      height: 40px;
+      width: 32px;
+      height: 32px;
     }
 
     h2 {
-      font-size: 18px;
-      margin: 5px 0;
+      font-size: 17px;
+      margin: 0;
       color: #333;
+    }
+
+    .tier-badge {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 10px;
+      text-transform: uppercase;
+    }
+
+    .tier-badge.free {
+      background-color: #e0e0e0;
+      color: #666;
+    }
+
+    .tier-badge.pro {
+      background: linear-gradient(135deg, #FF9800, #FF5722);
+      color: #ffffff;
+      box-shadow: 0 2px 4px rgba(255, 152, 0, 0.3);
+    }
+
+    .dev-toggle-container {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      color: #888;
+    }
+
+    .upgrade-box {
+      background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+      border: 1px solid #ffb74d;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      margin-bottom: 12px;
+      font-size: 12px;
+      color: #e65100;
+    }
+
+    .upgrade-box p {
+      margin: 0 0 6px 0;
+      font-weight: 600;
+    }
+
+    .btn-upgrade {
+      background: #ff9800;
+      color: #ffffff;
+      border: none;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 11px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: transform 0.1s;
+    }
+
+    .btn-upgrade:hover {
+      background: #f57c00;
+      transform: translateY(-1px);
     }
 
     .section {
       border-top: 1px solid #eee;
-      padding: 12px 0;
+      padding: 10px 0;
     }
 
     .section-title {
       font-weight: 600;
-      font-size: 14px;
-      color: #666;
+      font-size: 13px;
+      color: #555;
       margin-bottom: 8px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: space-between;
+    }
+
+    .pro-tag {
+      background: #ff9800;
+      color: #fff;
+      border-radius: 4px;
+      font-size: 9px;
+      padding: 1px 5px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .pro-locked-mask {
+      opacity: 0.5;
+      pointer-events: none;
+      user-select: none;
     }
 
     .control-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 13px;
+      font-size: 12px;
       color: #444;
-      margin-bottom: 5px;
+      margin-bottom: 6px;
     }
 
     /* Switch Style */
     .switch {
       position: relative;
       display: inline-block;
-      width: 34px;
-      height: 20px;
+      width: 32px;
+      height: 18px;
     }
 
     .switch input {
@@ -75,19 +165,19 @@
       right: 0;
       bottom: 0;
       background-color: #ccc;
-      transition: .4s;
-      border-radius: 20px;
+      transition: .3s;
+      border-radius: 18px;
     }
 
     .slider:before {
       position: absolute;
       content: "";
-      height: 14px;
-      width: 14px;
+      height: 12px;
+      width: 12px;
       left: 3px;
       bottom: 3px;
       background-color: white;
-      transition: .4s;
+      transition: .3s;
       border-radius: 50%;
     }
 
@@ -99,9 +189,131 @@
       transform: translateX(14px);
     }
 
+    /* Temporary Pause (Snooze) */
+    .snooze-grid {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .btn-snooze {
+      flex: 1;
+      padding: 6px 2px;
+      background: #e3f2fd;
+      color: #1976d2;
+      border: 1px solid #90caf9;
+      border-radius: 6px;
+      font-size: 11px;
+      cursor: pointer;
+      font-weight: 600;
+      text-align: center;
+      transition: background 0.2s;
+    }
+
+    .btn-snooze:hover {
+      background: #bbdefb;
+    }
+
+    .snooze-active-card {
+      background: #e8f5e9;
+      border: 1px solid #a5d6a7;
+      border-radius: 6px;
+      padding: 8px;
+      text-align: center;
+      font-size: 12px;
+      color: #2e7d32;
+      margin-top: 6px;
+    }
+
+    .snooze-timer-text {
+      font-weight: 600;
+      font-size: 14px;
+      color: #1b5e20;
+    }
+
+    .btn-resume {
+      background: #4caf50;
+      color: white;
+      border: none;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 6px;
+    }
+
+    /* Focus Schedule */
+    .time-picker-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      margin-top: 6px;
+      font-size: 11px;
+    }
+
+    .time-input {
+      width: 65px;
+      padding: 3px 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 11px;
+    }
+
+    .days-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 6px;
+    }
+
+    .btn-day {
+      width: 28px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f0f0f0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-day.active {
+      background: #2196F3;
+      color: white;
+      border-color: #1976D2;
+    }
+
+    /* Analytics Dashboard Button */
+    .btn-stats {
+      width: 100%;
+      padding: 8px;
+      background: linear-gradient(135deg, #673ab7, #512da8);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 12px;
+      cursor: pointer;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 2px 4px rgba(103, 58, 183, 0.2);
+    }
+
+    .btn-stats:hover {
+      background: linear-gradient(135deg, #5e35b1, #4527a0);
+    }
+
     .metrics {
       background: #f8f9fa;
-      padding: 10px;
+      padding: 8px 12px;
       border-radius: 8px;
       margin-top: 10px;
       display: flex;
@@ -112,15 +324,6 @@
     .metric-value {
       font-weight: 600;
       color: #2196F3;
-    }
-
-    .dev {
-      display: block;
-      text-align: center;
-      margin-top: 15px;
-      font-size: 10px;
-      color: #999;
-      text-decoration: none;
     }
 
     .affiliate-message {
@@ -139,16 +342,175 @@
     .affiliate-message:hover {
       background: #ffecb3;
     }
+
+    .dev {
+      display: block;
+      text-align: center;
+      margin-top: 12px;
+      font-size: 10px;
+      color: #999;
+      text-decoration: none;
+    }
+
+    /* Stats Modal Overlay */
+    .stats-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #ffffff;
+      z-index: 100;
+      padding: 14px;
+      overflow-y: auto;
+    }
+
+    .stats-modal.open {
+      display: block;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+    }
+
+    .btn-close-modal {
+      background: #f0f0f0;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      line-height: 24px;
+      text-align: center;
+    }
+
+    .bar-group {
+      margin-bottom: 10px;
+    }
+
+    .bar-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+
+    .bar-track {
+      background: #eee;
+      height: 10px;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 5px;
+      transition: width 0.4s ease;
+    }
+
+    .fill-yt { background: #FF0000; }
+    .fill-ig { background: #E1306C; }
+    .fill-fb { background: #1877F2; }
+
+    .history-list {
+      margin-top: 12px;
+      font-size: 11px;
+    }
+
+    .history-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+      border-bottom: 1px dashed #eee;
+    }
   </style>
 </head>
 
 <body>
+  <!-- Header with Status & Dev Mode Toggle -->
   <div class="header">
-    <img src="images/icon.png">
-    <h2>NoReels</h2>
+    <div class="header-left">
+      <img src="images/icon.png" alt="NoReels Logo">
+      <h2>NoReels</h2>
+      <span id="tier-badge" class="tier-badge free">FREE</span>
+    </div>
+    <div class="dev-toggle-container">
+      <label class="switch" style="width: 24px; height: 14px;">
+        <input type="checkbox" id="toggle-pro-mode">
+        <span class="slider" style="border-radius: 14px;"></span>
+      </label>
+      <span id="lbl-dev-pro">Simular PRO</span>
+    </div>
   </div>
 
-  <!-- YouTube Section -->
+  <!-- Upgrade Banner for Free Users -->
+  <div id="upgrade-banner" class="upgrade-box">
+    <p id="msg-upgrade-banner">Desbloqueie Pausa Temporária, Modo Foco e Estatísticas!</p>
+    <button id="btn-upgrade-action" class="btn-upgrade">Ativar Modo PRO</button>
+  </div>
+
+  <!-- PRO Feature 1: Temporary Pause (Snooze) -->
+  <div class="section" id="sec-snooze">
+    <div class="section-title">
+      <span id="lbl-snooze-title">Pausa Temporária</span>
+      <span id="tag-snooze-pro" class="pro-tag">PRO</span>
+    </div>
+    <div id="snooze-content" class="pro-locked-mask">
+      <div id="snooze-controls" class="snooze-grid">
+        <button class="btn-snooze" data-minutes="5">5 min</button>
+        <button class="btn-snooze" data-minutes="15">15 min</button>
+        <button class="btn-snooze" data-minutes="30">30 min</button>
+        <button class="btn-snooze" data-minutes="60">1 hora</button>
+      </div>
+      <div id="snooze-active-box" class="snooze-active-card" style="display: none;">
+        <div>Pausado até reativação</div>
+        <div id="snooze-timer" class="snooze-timer-text">00:00</div>
+        <button id="btn-resume-now" class="btn-resume">Reativar Agora</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRO Feature 2: Scheduled Focus Mode -->
+  <div class="section" id="sec-focus">
+    <div class="section-title">
+      <span id="lbl-focus-title">Modo Foco Programado</span>
+      <span id="tag-focus-pro" class="pro-tag">PRO</span>
+    </div>
+    <div id="focus-content" class="pro-locked-mask">
+      <div class="control-item">
+        <span id="lbl-focus-enable">Ativar Agendamento</span>
+        <label class="switch">
+          <input type="checkbox" id="focus-schedule-enabled">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="time-picker-row">
+        <span>Horário:</span>
+        <input type="time" id="focus-start-time" value="09:00" class="time-input">
+        <span>até</span>
+        <input type="time" id="focus-end-time" value="17:00" class="time-input">
+      </div>
+      <div class="days-row" id="days-container">
+        <button class="btn-day active" data-day="1">S</button>
+        <button class="btn-day active" data-day="2">T</button>
+        <button class="btn-day active" data-day="3">Q</button>
+        <button class="btn-day active" data-day="4">Q</button>
+        <button class="btn-day active" data-day="5">S</button>
+        <button class="btn-day" data-day="6">S</button>
+        <button class="btn-day" data-day="0">D</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- YouTube Section (Free) -->
   <div class="section">
     <div class="section-title">YouTube</div>
     <div class="control-item">
@@ -161,27 +523,27 @@
     <div class="control-item">
       <span>Hide Comments</span>
       <label class="switch">
-        <input type="checkbox" id="yt-comments" checked>
+        <input type="checkbox" id="yt-comments">
         <span class="slider"></span>
       </label>
     </div>
     <div class="control-item">
       <span>Home Recommendations</span>
       <label class="switch">
-        <input type="checkbox" id="yt-home" checked>
+        <input type="checkbox" id="yt-home">
         <span class="slider"></span>
       </label>
     </div>
     <div class="control-item">
       <span>Video Recommendations</span>
       <label class="switch">
-        <input type="checkbox" id="yt-video-rec" checked>
+        <input type="checkbox" id="yt-video-rec">
         <span class="slider"></span>
       </label>
     </div>
   </div>
 
-  <!-- Instagram Section -->
+  <!-- Instagram Section (Free) -->
   <div class="section">
     <div class="section-title">Instagram</div>
     <div class="control-item">
@@ -193,7 +555,7 @@
     </div>
   </div>
 
-  <!-- Facebook Section -->
+  <!-- Facebook Section (Free) -->
   <div class="section">
     <div class="section-title">Facebook</div>
     <div class="control-item">
@@ -206,15 +568,24 @@
     <div class="control-item">
       <span>Block Stories</span>
       <label class="switch">
-        <input type="checkbox" id="fb-stories" checked>
+        <input type="checkbox" id="fb-stories">
         <span class="slider"></span>
       </label>
     </div>
   </div>
 
+  <!-- Basic Metrics -->
   <div class="metrics">
-    <div>Blocked: <span id="total-blocked" class="metric-value">0</span></div>
-    <div>Saved: <span id="time-saved" class="metric-value">0m</span></div>
+    <div>Bloqueados: <span id="total-blocked" class="metric-value">0</span></div>
+    <div>Tempo Salvo: <span id="time-saved" class="metric-value">0m</span></div>
+  </div>
+
+  <!-- PRO Feature 3: Advanced Stats Button -->
+  <div id="sec-stats">
+    <button id="btn-open-stats" class="btn-stats">
+      📊 <span id="lbl-btn-stats">Estatísticas Avançadas</span>
+      <span id="tag-stats-pro" class="pro-tag" style="background: #ffb74d; color: #333;">PRO</span>
+    </button>
   </div>
 
   <!-- Support Affiliate Message -->
@@ -223,6 +594,40 @@
   </a>
 
   <a href="https://www.linkedin.com/in/matheus-pedrosa-custodio/" target="_blank" class="dev">Developed by Matheus Pedrosa</a>
+
+  <!-- Stats Modal View -->
+  <div id="stats-modal" class="stats-modal">
+    <div class="modal-header">
+      <h3 style="margin: 0; font-size: 15px;" id="lbl-stats-modal-title">Estatísticas Avançadas</h3>
+      <button id="btn-close-stats" class="btn-close-modal">&times;</button>
+    </div>
+
+    <div style="font-size: 12px; margin-bottom: 10px; color: #666;">
+      Detalhamento por Plataforma
+    </div>
+
+    <div class="bar-group">
+      <div class="bar-label"><span>YouTube</span><span id="stat-count-yt">0</span></div>
+      <div class="bar-track"><div id="bar-yt" class="bar-fill fill-yt" style="width: 0%;"></div></div>
+    </div>
+
+    <div class="bar-group">
+      <div class="bar-label"><span>Instagram</span><span id="stat-count-ig">0</span></div>
+      <div class="bar-track"><div id="bar-ig" class="bar-fill fill-ig" style="width: 0%;"></div></div>
+    </div>
+
+    <div class="bar-group">
+      <div class="bar-label"><span>Facebook</span><span id="stat-count-fb">0</span></div>
+      <div class="bar-track"><div id="bar-fb" class="bar-fill fill-fb" style="width: 0%;"></div></div>
+    </div>
+
+    <div style="font-size: 12px; margin: 15px 0 6px 0; color: #666;">
+      Histórico dos Últimos Dias
+    </div>
+    <div id="history-container" class="history-list">
+      <!-- Dynamic history rows -->
+    </div>
+  </div>
 
   <script src="popup.js"></script>
 </body>
