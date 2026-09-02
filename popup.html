@@ -5,13 +5,19 @@
   <meta charset="UTF-8">
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      width: 280px;
+      width: 350px;
+      min-width: 350px;
       font-family: 'Fredoka', sans-serif;
       padding: 14px;
       background-color: #ffffff;
       margin: 0;
       color: #333;
+      position: relative;
     }
 
     .header {
@@ -67,6 +73,22 @@
       color: #888;
     }
 
+    .pro-tag {
+      background: #ff9800;
+      color: #fff;
+      border-radius: 4px;
+      font-size: 9px;
+      padding: 1px 5px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .pro-locked-mask {
+      opacity: 0.5;
+      pointer-events: none;
+      user-select: none;
+    }
+
     .upgrade-box {
       background: linear-gradient(135deg, #fff3e0, #ffe0b2);
       border: 1px solid #ffb74d;
@@ -103,35 +125,261 @@
       transform: translateY(-1px);
     }
 
-    .section {
-      border-top: 1px solid #eee;
-      padding: 10px 0;
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    .section-title {
+    .header-nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 8px;
+      background: #f1f3f4;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 11px;
       font-weight: 600;
-      font-size: 13px;
       color: #555;
-      margin-bottom: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .header-nav-btn:hover {
+      background: #e8eaed;
+      color: #222;
+      border-color: #dadce0;
+    }
+
+    .header-nav-btn.active {
+      background: #ffffff;
+      color: #1a73e8;
+      border-color: #1a73e8;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    .header-nav-icon {
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+
+    .stats-icon-color {
+      color: #673ab7;
+      fill: #673ab7;
+    }
+
+    .config-icon-color {
+      color: #ff9800;
+      fill: #ff9800;
+    }
+
+    /* Single Column Social Cards */
+    .network-card {
+      background: #fafbfc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin-bottom: 10px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    }
+
+    .network-card-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #333;
+      padding-bottom: 6px;
+      margin-bottom: 4px;
+      border-bottom: 1px solid #edf0f2;
+    }
+
+    .network-icon {
+      width: 15px;
+      height: 15px;
+      flex-shrink: 0;
+    }
+
+    .yt-color { color: #ff0000; fill: #ff0000; }
+    .ig-color { color: #e1306c; fill: #e1306c; }
+    .fb-color { color: #1877f2; fill: #1877f2; }
+
+    /* Overlay View Panels for Análise and Config */
+    .view-overlay {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #ffffff;
+      padding: 14px;
+      z-index: 50;
+      animation: fadeIn 0.18s ease-in-out;
+      overflow-y: auto;
+    }
+
+    .view-overlay.active {
+      display: block;
+    }
+
+    .view-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #eee;
     }
 
-    .pro-tag {
-      background: #ff9800;
-      color: #fff;
-      border-radius: 4px;
-      font-size: 9px;
-      padding: 1px 5px;
+    .view-title-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-back-view {
+      background: #f1f3f4;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 4px 9px;
+      font-family: inherit;
+      font-size: 11px;
       font-weight: 600;
-      text-transform: uppercase;
+      color: #444;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: background 0.15s;
     }
 
-    .pro-locked-mask {
-      opacity: 0.5;
+    .btn-back-view:hover {
+      background: #e2e8f0;
+      color: #111;
+    }
+
+    .footer-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px solid #eee;
+    }
+
+    .footer-row .dev {
+      margin-top: 0;
+    }
+
+    .stats-sub-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 6px;
+    }
+
+    /* Pro Analytics Blur Lock */
+    .stats-container-rel {
+      position: relative;
+      min-height: 200px;
+    }
+
+    .stats-blur-content {
+      transition: filter 0.25s ease, opacity 0.25s ease;
+    }
+
+    .stats-blur-content.blurred {
+      filter: blur(5px);
+      opacity: 0.4;
       pointer-events: none;
       user-select: none;
+    }
+
+    .stats-lock-overlay {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 14px;
+      z-index: 5;
+    }
+
+    .stats-lock-overlay.active {
+      display: flex;
+    }
+
+    .stats-lock-icon {
+      font-size: 24px;
+      margin-bottom: 6px;
+    }
+
+    .stats-lock-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #111;
+      margin-bottom: 4px;
+    }
+
+    .stats-lock-desc {
+      font-size: 11px;
+      color: #555;
+      margin-bottom: 12px;
+      line-height: 1.3;
+    }
+
+    .btn-unlock-stats {
+      background: linear-gradient(135deg, #ff9800, #f57c00);
+      color: #ffffff;
+      border: none;
+      padding: 7px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 11px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(245, 124, 0, 0.3);
+      transition: transform 0.1s;
+    }
+
+    .btn-unlock-stats:hover {
+      transform: translateY(-1px);
+    }
+
+    .tabs-content {
+      background: #fafbfc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 6px 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    }
+
+    .tab-panel {
+      display: none;
+      animation: fadeIn 0.15s ease-in-out;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(2px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .control-item {
@@ -139,8 +387,18 @@
       justify-content: space-between;
       align-items: center;
       font-size: 12px;
-      color: #444;
-      margin-bottom: 6px;
+      color: #374151;
+      padding: 7px 0;
+      border-bottom: 1px solid #f0f2f5;
+    }
+
+    .control-item:last-child {
+      border-bottom: none;
+      padding-bottom: 2px;
+    }
+
+    .control-item:first-child {
+      padding-top: 2px;
     }
 
     /* Switch Style */
@@ -312,10 +570,12 @@
     }
 
     .metrics {
-      background: #f8f9fa;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
       padding: 8px 12px;
-      border-radius: 8px;
-      margin-top: 10px;
+      border-radius: 6px;
+      margin-top: 4px;
+      margin-bottom: 10px;
       display: flex;
       justify-content: space-around;
       font-size: 12px;
@@ -326,30 +586,31 @@
       color: #2196F3;
     }
 
-    .affiliate-message {
-      display: block;
-      text-align: center;
-      margin-top: 10px;
-      font-size: 11px;
-      color: #666;
-      background: #fff8e1;
-      padding: 8px;
-      border-radius: 6px;
-      text-decoration: none;
-      border: 1px solid #ffe082;
-    }
 
-    .affiliate-message:hover {
-      background: #ffecb3;
-    }
 
     .dev {
-      display: block;
-      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
       margin-top: 12px;
-      font-size: 10px;
-      color: #999;
+      font-size: 11px;
+      color: #0a66c2;
+      font-weight: 500;
       text-decoration: none;
+      transition: opacity 0.2s;
+    }
+
+    .dev:hover {
+      text-decoration: underline;
+      opacity: 0.85;
+    }
+
+    .dev img {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+      border-radius: 2px;
     }
 
     /* Stats Modal Overlay */
@@ -434,14 +695,125 @@
   </style>
 </head>
 
-<body>
-  <!-- Header with Status & Dev Mode Toggle -->
+<body>  <!-- Header with Status & Right-side Action Buttons -->
   <div class="header">
     <div class="header-left">
       <img src="images/icon.png" alt="NoReels Logo">
       <h2>NoReels</h2>
       <span id="tier-badge" class="tier-badge free">FREE</span>
     </div>
+    <div class="header-actions">
+      <button id="btn-open-stats" class="header-nav-btn" data-panel="panel-stats">
+        <svg class="header-nav-icon stats-icon-color" viewBox="0 0 24 24">
+          <path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/>
+        </svg>
+        <span id="lbl-nav-stats">Análise</span>
+        <span class="pro-tag" style="font-size: 8px; padding: 0 3px; line-height: 12px;">PRO</span>
+      </button>
+
+      <button id="btn-open-config" class="header-nav-btn" data-panel="panel-config" title="Configurações">
+        <svg class="header-nav-icon config-icon-color" viewBox="0 0 24 24">
+          <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+        </svg>
+        <span class="pro-tag" style="font-size: 8px; padding: 0 3px; line-height: 12px;">PRO</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Upgrade Banner on Home for Free Users -->
+  <div id="upgrade-banner" class="upgrade-box">
+    <p id="msg-upgrade-banner">Desbloqueie Pausa Temporária, Modo Foco e Estatísticas!</p>
+    <button id="btn-upgrade-action" class="btn-upgrade">Ativar Modo PRO</button>
+  </div>
+
+  <!-- Main View: Social Media Configs in a Single Column -->
+  <div class="main-social-view">
+    <!-- YouTube Section -->
+    <div class="network-card">
+      <div class="network-card-header">
+        <svg class="network-icon yt-color" viewBox="0 0 24 24">
+          <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+        </svg>
+        <span>YouTube</span>
+      </div>
+      <div class="control-item">
+        <span id="lbl-yt-shorts">Block Shorts</span>
+        <label class="switch">
+          <input type="checkbox" id="yt-shorts" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="control-item">
+        <span id="lbl-yt-comments">Hide Comments</span>
+        <label class="switch">
+          <input type="checkbox" id="yt-comments">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="control-item">
+        <span id="lbl-yt-home">Home Recommendations</span>
+        <label class="switch">
+          <input type="checkbox" id="yt-home">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="control-item">
+        <span id="lbl-yt-video-rec">Video Recommendations</span>
+        <label class="switch">
+          <input type="checkbox" id="yt-video-rec">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Instagram Section -->
+    <div class="network-card">
+      <div class="network-card-header">
+        <svg class="network-icon ig-color" viewBox="0 0 24 24">
+          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+        </svg>
+        <span>Instagram</span>
+      </div>
+      <div class="control-item">
+        <span id="lbl-ig-reels">Block Reels</span>
+        <label class="switch">
+          <input type="checkbox" id="ig-reels" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Facebook Section -->
+    <div class="network-card">
+      <div class="network-card-header">
+        <svg class="network-icon fb-color" viewBox="0 0 24 24">
+          <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+        </svg>
+        <span>Facebook</span>
+      </div>
+      <div class="control-item">
+        <span id="lbl-fb-reels">Block Reels</span>
+        <label class="switch">
+          <input type="checkbox" id="fb-reels" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="control-item">
+        <span id="lbl-fb-stories">Block Stories</span>
+        <label class="switch">
+          <input type="checkbox" id="fb-stories">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer with Dev Link and Dev Mode Simulation -->
+  <div class="footer-row">
+    <a href="https://www.linkedin.com/in/matheus-pedrosa-custodio/" target="_blank" class="dev">
+      <img src="images/linkedin.png" alt="LinkedIn">
+      <span id="lbl-dev-name">Developed by Matheus Pedrosa</span>
+    </a>
     <div class="dev-toggle-container">
       <label class="switch" style="width: 24px; height: 14px;">
         <input type="checkbox" id="toggle-pro-mode">
@@ -451,181 +823,132 @@
     </div>
   </div>
 
-  <!-- Upgrade Banner for Free Users -->
-  <div id="upgrade-banner" class="upgrade-box">
-    <p id="msg-upgrade-banner">Desbloqueie Pausa Temporária, Modo Foco e Estatísticas!</p>
-    <button id="btn-upgrade-action" class="btn-upgrade">Ativar Modo PRO</button>
-  </div>
-
-  <!-- PRO Feature 1: Temporary Pause (Snooze) -->
-  <div class="section" id="sec-snooze">
-    <div class="section-title">
-      <span id="lbl-snooze-title">Pausa Temporária</span>
-      <span id="tag-snooze-pro" class="pro-tag">PRO</span>
-    </div>
-    <div id="snooze-content" class="pro-locked-mask">
-      <div id="snooze-controls" class="snooze-grid">
-        <button class="btn-snooze" data-minutes="5">5 min</button>
-        <button class="btn-snooze" data-minutes="15">15 min</button>
-        <button class="btn-snooze" data-minutes="30">30 min</button>
-        <button class="btn-snooze" data-minutes="60">1 hora</button>
+  <!-- Panel: Análises Overlay -->
+  <div id="panel-stats" class="view-overlay">
+    <div class="view-header">
+      <button class="btn-back-view" data-close="panel-stats">
+        <span class="lbl-btn-back">← Voltar</span>
+      </button>
+      <div class="view-title-group">
+        <span id="lbl-stats-modal-title" style="font-weight: 600; font-size: 13px;">Estatísticas & Análise</span>
+        <span id="tag-stats-pro" class="pro-tag">PRO</span>
       </div>
-      <div id="snooze-active-box" class="snooze-active-card" style="display: none;">
-        <div>Pausado até reativação</div>
-        <div id="snooze-timer" class="snooze-timer-text">00:00</div>
-        <button id="btn-resume-now" class="btn-resume">Reativar Agora</button>
+      <button class="btn-close-modal" data-close="panel-stats">&times;</button>
+    </div>
+
+    <div class="stats-container-rel">
+      <!-- Blur Lock Overlay for Free users -->
+      <div id="stats-lock-overlay" class="stats-lock-overlay active">
+        <div class="stats-lock-icon">🔒</div>
+        <div id="lbl-lock-title" class="stats-lock-title">Recurso Exclusivo PRO</div>
+        <div id="lbl-lock-desc" class="stats-lock-desc">Veja quanto tempo você economizou e acompanhe o histórico por rede social.</div>
+        <button id="btn-unlock-stats" class="btn-unlock-stats">Desbloquear Análise</button>
+      </div>
+
+      <!-- Stats Content (Blurred when Free) -->
+      <div id="stats-blur-content" class="stats-blur-content blurred">
+        <div class="stats-sub-header">
+          <span id="lbl-general-metrics">Métricas Gerais</span>
+        </div>
+        <div class="metrics" style="margin-top: 0; margin-bottom: 12px;">
+          <div><span id="lbl-blocked">Bloqueados:</span> <span id="total-blocked" class="metric-value">0</span></div>
+          <div><span id="lbl-time-saved">Tempo Salvo:</span> <span id="time-saved" class="metric-value">0m</span></div>
+        </div>
+
+        <div class="stats-sub-header" style="border-top: 1px dashed #eee; padding-top: 8px;">
+          <span id="lbl-breakdown">Detalhamento por Rede</span>
+        </div>
+        <div>
+          <div class="bar-group">
+            <div class="bar-label"><span>YouTube</span><span id="stat-count-yt">0</span></div>
+            <div class="bar-track"><div id="bar-yt" class="bar-fill fill-yt" style="width: 0%;"></div></div>
+          </div>
+
+          <div class="bar-group">
+            <div class="bar-label"><span>Instagram</span><span id="stat-count-ig">0</span></div>
+            <div class="bar-track"><div id="bar-ig" class="bar-fill fill-ig" style="width: 0%;"></div></div>
+          </div>
+
+          <div class="bar-group">
+            <div class="bar-label"><span>Facebook</span><span id="stat-count-fb">0</span></div>
+            <div class="bar-track"><div id="bar-fb" class="bar-fill fill-fb" style="width: 0%;"></div></div>
+          </div>
+
+          <div id="lbl-history-title" style="font-size: 11px; margin: 10px 0 4px 0; color: #666; font-weight: 600;">
+            Histórico dos Últimos Dias
+          </div>
+          <div id="history-container" class="history-list" style="margin-top: 4px; max-height: 120px; overflow-y: auto;">
+            <!-- Dynamic history rows -->
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- PRO Feature 2: Scheduled Focus Mode -->
-  <div class="section" id="sec-focus">
-    <div class="section-title">
-      <span id="lbl-focus-title">Modo Foco Programado</span>
-      <span id="tag-focus-pro" class="pro-tag">PRO</span>
-    </div>
-    <div id="focus-content" class="pro-locked-mask">
-      <div class="control-item">
-        <span id="lbl-focus-enable">Ativar Agendamento</span>
-        <label class="switch">
-          <input type="checkbox" id="focus-schedule-enabled">
-          <span class="slider"></span>
-        </label>
+  <!-- Panel: Configurações Overlay -->
+  <div id="panel-config" class="view-overlay">
+    <div class="view-header">
+      <button class="btn-back-view" data-close="panel-config">
+        <span class="lbl-btn-back">← Voltar</span>
+      </button>
+      <div class="view-title-group">
+        <span id="lbl-config-title" style="font-weight: 600; font-size: 13px;">Configurações PRO</span>
+        <span class="pro-tag">PRO</span>
       </div>
-      <div class="time-picker-row">
-        <span>Horário:</span>
-        <input type="time" id="focus-start-time" value="09:00" class="time-input">
-        <span>até</span>
-        <input type="time" id="focus-end-time" value="17:00" class="time-input">
+      <button class="btn-close-modal" data-close="panel-config">&times;</button>
+    </div>
+
+    <!-- PRO Feature 1: Temporary Pause (Snooze) -->
+    <div id="sec-snooze" style="margin-top: 6px;">
+      <div class="stats-sub-header">
+        <span id="lbl-snooze-title">Pausa Temporária</span>
+        <span id="tag-snooze-pro" class="pro-tag">PRO</span>
       </div>
-      <div class="days-row" id="days-container">
-        <button class="btn-day active" data-day="1">S</button>
-        <button class="btn-day active" data-day="2">T</button>
-        <button class="btn-day active" data-day="3">Q</button>
-        <button class="btn-day active" data-day="4">Q</button>
-        <button class="btn-day active" data-day="5">S</button>
-        <button class="btn-day" data-day="6">S</button>
-        <button class="btn-day" data-day="0">D</button>
+      <div id="snooze-content" class="pro-locked-mask">
+        <div id="snooze-controls" class="snooze-grid">
+          <button class="btn-snooze" data-minutes="5">5 min</button>
+          <button class="btn-snooze" data-minutes="15">15 min</button>
+          <button class="btn-snooze" data-minutes="30">30 min</button>
+          <button class="btn-snooze" data-minutes="60">1 hora</button>
+        </div>
+        <div id="snooze-active-box" class="snooze-active-card" style="display: none;">
+          <div id="lbl-snooze-status">Pausado até reativação</div>
+          <div id="snooze-timer" class="snooze-timer-text">00:00</div>
+          <button id="btn-resume-now" class="btn-resume">Reativar Agora</button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- YouTube Section (Free) -->
-  <div class="section">
-    <div class="section-title">YouTube</div>
-    <div class="control-item">
-      <span>Block Shorts</span>
-      <label class="switch">
-        <input type="checkbox" id="yt-shorts" checked>
-        <span class="slider"></span>
-      </label>
-    </div>
-    <div class="control-item">
-      <span>Hide Comments</span>
-      <label class="switch">
-        <input type="checkbox" id="yt-comments">
-        <span class="slider"></span>
-      </label>
-    </div>
-    <div class="control-item">
-      <span>Home Recommendations</span>
-      <label class="switch">
-        <input type="checkbox" id="yt-home">
-        <span class="slider"></span>
-      </label>
-    </div>
-    <div class="control-item">
-      <span>Video Recommendations</span>
-      <label class="switch">
-        <input type="checkbox" id="yt-video-rec">
-        <span class="slider"></span>
-      </label>
-    </div>
-  </div>
-
-  <!-- Instagram Section (Free) -->
-  <div class="section">
-    <div class="section-title">Instagram</div>
-    <div class="control-item">
-      <span>Block Reels</span>
-      <label class="switch">
-        <input type="checkbox" id="ig-reels" checked>
-        <span class="slider"></span>
-      </label>
-    </div>
-  </div>
-
-  <!-- Facebook Section (Free) -->
-  <div class="section">
-    <div class="section-title">Facebook</div>
-    <div class="control-item">
-      <span>Block Reels</span>
-      <label class="switch">
-        <input type="checkbox" id="fb-reels" checked>
-        <span class="slider"></span>
-      </label>
-    </div>
-    <div class="control-item">
-      <span>Block Stories</span>
-      <label class="switch">
-        <input type="checkbox" id="fb-stories">
-        <span class="slider"></span>
-      </label>
-    </div>
-  </div>
-
-  <!-- Basic Metrics -->
-  <div class="metrics">
-    <div>Bloqueados: <span id="total-blocked" class="metric-value">0</span></div>
-    <div>Tempo Salvo: <span id="time-saved" class="metric-value">0m</span></div>
-  </div>
-
-  <!-- PRO Feature 3: Advanced Stats Button -->
-  <div id="sec-stats">
-    <button id="btn-open-stats" class="btn-stats">
-      📊 <span id="lbl-btn-stats">Estatísticas Avançadas</span>
-      <span id="tag-stats-pro" class="pro-tag" style="background: #ffb74d; color: #333;">PRO</span>
-    </button>
-  </div>
-
-  <!-- Support Affiliate Message -->
-  <a href="https://amzn.to/3Q2wrRr" target="_blank" class="affiliate-message">
-    __MSG_affiliateMessage__
-  </a>
-
-  <a href="https://www.linkedin.com/in/matheus-pedrosa-custodio/" target="_blank" class="dev">Developed by Matheus Pedrosa</a>
-
-  <!-- Stats Modal View -->
-  <div id="stats-modal" class="stats-modal">
-    <div class="modal-header">
-      <h3 style="margin: 0; font-size: 15px;" id="lbl-stats-modal-title">Estatísticas Avançadas</h3>
-      <button id="btn-close-stats" class="btn-close-modal">&times;</button>
-    </div>
-
-    <div style="font-size: 12px; margin-bottom: 10px; color: #666;">
-      Detalhamento por Plataforma
-    </div>
-
-    <div class="bar-group">
-      <div class="bar-label"><span>YouTube</span><span id="stat-count-yt">0</span></div>
-      <div class="bar-track"><div id="bar-yt" class="bar-fill fill-yt" style="width: 0%;"></div></div>
-    </div>
-
-    <div class="bar-group">
-      <div class="bar-label"><span>Instagram</span><span id="stat-count-ig">0</span></div>
-      <div class="bar-track"><div id="bar-ig" class="bar-fill fill-ig" style="width: 0%;"></div></div>
-    </div>
-
-    <div class="bar-group">
-      <div class="bar-label"><span>Facebook</span><span id="stat-count-fb">0</span></div>
-      <div class="bar-track"><div id="bar-fb" class="bar-fill fill-fb" style="width: 0%;"></div></div>
-    </div>
-
-    <div style="font-size: 12px; margin: 15px 0 6px 0; color: #666;">
-      Histórico dos Últimos Dias
-    </div>
-    <div id="history-container" class="history-list">
-      <!-- Dynamic history rows -->
+    <!-- PRO Feature 2: Scheduled Focus Mode -->
+    <div id="sec-focus" style="border-top: 1px dashed #eee; padding-top: 10px; margin-top: 14px;">
+      <div class="stats-sub-header">
+        <span id="lbl-focus-title">Modo Foco Programado</span>
+        <span id="tag-focus-pro" class="pro-tag">PRO</span>
+      </div>
+      <div id="focus-content" class="pro-locked-mask">
+        <div class="control-item">
+          <span id="lbl-focus-enable">Ativar Agendamento</span>
+          <label class="switch">
+            <input type="checkbox" id="focus-schedule-enabled">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="time-picker-row">
+          <span id="lbl-focus-hours">Horário:</span>
+          <input type="time" id="focus-start-time" value="09:00" class="time-input">
+          <span id="lbl-focus-until">até</span>
+          <input type="time" id="focus-end-time" value="17:00" class="time-input">
+        </div>
+        <div class="days-row" id="days-container">
+          <button class="btn-day active" data-day="1">S</button>
+          <button class="btn-day active" data-day="2">T</button>
+          <button class="btn-day active" data-day="3">Q</button>
+          <button class="btn-day active" data-day="4">Q</button>
+          <button class="btn-day active" data-day="5">S</button>
+          <button class="btn-day" data-day="6">S</button>
+          <button class="btn-day" data-day="0">D</button>
+        </div>
+      </div>
     </div>
   </div>
 

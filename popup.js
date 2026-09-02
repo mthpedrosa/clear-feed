@@ -100,16 +100,22 @@ function updateUI() {
     const tagSnoozePro = document.getElementById('tag-snooze-pro');
     const tagFocusPro = document.getElementById('tag-focus-pro');
     const tagStatsPro = document.getElementById('tag-stats-pro');
+    const statsBlurContent = document.getElementById('stats-blur-content');
+    const statsLockOverlay = document.getElementById('stats-lock-overlay');
 
     if (isPaidUser) {
       if (snoozeContentEl) snoozeContentEl.classList.remove('pro-locked-mask');
       if (focusContentEl) focusContentEl.classList.remove('pro-locked-mask');
+      if (statsBlurContent) statsBlurContent.classList.remove('blurred');
+      if (statsLockOverlay) statsLockOverlay.classList.remove('active');
       if (tagSnoozePro) tagSnoozePro.style.display = 'none';
       if (tagFocusPro) tagFocusPro.style.display = 'none';
       if (tagStatsPro) tagStatsPro.style.display = 'none';
     } else {
       if (snoozeContentEl) snoozeContentEl.classList.add('pro-locked-mask');
       if (focusContentEl) focusContentEl.classList.add('pro-locked-mask');
+      if (statsBlurContent) statsBlurContent.classList.add('blurred');
+      if (statsLockOverlay) statsLockOverlay.classList.add('active');
       if (tagSnoozePro) tagSnoozePro.style.display = 'inline-block';
       if (tagFocusPro) tagFocusPro.style.display = 'inline-block';
       if (tagStatsPro) tagStatsPro.style.display = 'inline-block';
@@ -327,33 +333,53 @@ function setupEventListeners() {
     });
   });
 
-  // Analytics Dashboard Modal Controls
-  const btnOpenStats = document.getElementById('btn-open-stats');
-  const btnCloseStats = document.getElementById('btn-close-stats');
-  const statsModal = document.getElementById('stats-modal');
-
-  if (btnOpenStats && statsModal) {
-    btnOpenStats.addEventListener('click', () => {
-      chrome.storage.local.get(['isPaidUser'], (res) => {
-        if (!res.isPaidUser) {
-          if (confirm("Estatísticas Avançadas são um recurso PRO! Deseja ativar a demonstração PRO?")) {
-            chrome.storage.local.set({ isPaidUser: true }, () => {
-              updateUI();
-              statsModal.classList.add('open');
-            });
-          }
-          return;
-        }
-        statsModal.classList.add('open');
-      });
+  const btnUnlockStats = document.getElementById('btn-unlock-stats');
+  if (btnUnlockStats) {
+    btnUnlockStats.addEventListener('click', () => {
+      const btnUpgrade = document.getElementById('btn-upgrade-action');
+      if (btnUpgrade) btnUpgrade.click();
     });
   }
 
-  if (btnCloseStats && statsModal) {
-    btnCloseStats.addEventListener('click', () => {
-      statsModal.classList.remove('open');
-    });
+  // Header Navigation & Panel Overlays (Análise & Config)
+  const headerNavButtons = document.querySelectorAll('.header-nav-btn');
+  const viewOverlays = document.querySelectorAll('.view-overlay');
+  const closeButtons = document.querySelectorAll('[data-close]');
+
+  function openPanel(panelId) {
+    viewOverlays.forEach(v => v.classList.remove('active'));
+    headerNavButtons.forEach(b => b.classList.remove('active'));
+
+    const targetView = document.getElementById(panelId);
+    const targetBtn = document.querySelector(`.header-nav-btn[data-panel="${panelId}"]`);
+    if (targetView) {
+      targetView.classList.add('active');
+    }
+    if (targetBtn) {
+      targetBtn.classList.add('active');
+    }
   }
+
+  function closePanels() {
+    viewOverlays.forEach(v => v.classList.remove('active'));
+    headerNavButtons.forEach(b => b.classList.remove('active'));
+  }
+
+  headerNavButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const panelId = btn.getAttribute('data-panel');
+      const targetView = document.getElementById(panelId);
+      if (targetView && targetView.classList.contains('active')) {
+        closePanels();
+      } else {
+        openPanel(panelId);
+      }
+    });
+  });
+
+  closeButtons.forEach(btn => {
+    btn.addEventListener('click', closePanels);
+  });
 }
 
 function applyI18nTranslations() {
@@ -367,25 +393,58 @@ function applyI18nTranslations() {
     }
   };
 
+  const setI18nTitle = (id, key) => {
+    const el = document.getElementById(id);
+    if (el) {
+      const msg = chrome.i18n.getMessage(key);
+      if (msg) el.title = msg;
+    }
+  };
+
+  // Header & Home
+  setI18nText('lbl-nav-stats', 'navStats');
+  setI18nTitle('btn-open-config', 'configTitle');
+  setI18nText('msg-upgrade-banner', 'upgradeBanner');
+  setI18nText('btn-upgrade-action', 'upgradeBtn');
   setI18nText('lbl-dev-pro', 'toggleDevPro');
+  setI18nText('lbl-dev-name', 'devBy');
+
+  // Social Network Controls
+  setI18nText('lbl-yt-shorts', 'blockShorts');
+  setI18nText('lbl-yt-comments', 'hideComments');
+  setI18nText('lbl-yt-home', 'homeRecs');
+  setI18nText('lbl-yt-video-rec', 'videoRecs');
+  setI18nText('lbl-ig-reels', 'blockReels');
+  setI18nText('lbl-fb-reels', 'blockReels');
+  setI18nText('lbl-fb-stories', 'blockStories');
+
+  // Back buttons
+  const backLabels = document.querySelectorAll('.lbl-btn-back');
+  const backMsg = chrome.i18n.getMessage('btnBack');
+  if (backMsg) {
+    backLabels.forEach(el => { el.textContent = backMsg; });
+  }
+
+  // Analytics Overlay
+  setI18nText('lbl-stats-modal-title', 'statsModalTitle');
+  setI18nText('lbl-lock-title', 'lockTitle');
+  setI18nText('lbl-lock-desc', 'lockDesc');
+  setI18nText('btn-unlock-stats', 'btnUnlockStats');
+  setI18nText('lbl-general-metrics', 'generalMetrics');
+  setI18nText('lbl-blocked', 'lblBlocked');
+  setI18nText('lbl-time-saved', 'lblTimeSaved');
+  setI18nText('lbl-breakdown', 'breakdownTitle');
+  setI18nText('lbl-history-title', 'historyTitle');
+
+  // Config Overlay
+  setI18nText('lbl-config-title', 'configModalTitle');
   setI18nText('lbl-snooze-title', 'snoozeTitle');
+  setI18nText('lbl-snooze-status', 'snoozeStatus');
   setI18nText('btn-resume-now', 'btnResume');
   setI18nText('lbl-focus-title', 'focusTitle');
   setI18nText('lbl-focus-enable', 'focusEnable');
-  setI18nText('lbl-btn-stats', 'statsTitle');
-  setI18nText('lbl-stats-modal-title', 'statsModalTitle');
-  setI18nText('msg-upgrade-banner', 'upgradeBanner');
-  setI18nText('btn-upgrade-action', 'upgradeBtn');
-
-  try {
-    const affiliateEl = document.querySelector('.affiliate-message');
-    if (affiliateEl) {
-      const msg = chrome.i18n.getMessage('affiliateMessage');
-      if (msg) affiliateEl.textContent = msg;
-    }
-  } catch (e) {
-    // ignore
-  }
+  setI18nText('lbl-focus-hours', 'focusHoursLabel');
+  setI18nText('lbl-focus-until', 'focusUntil');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
