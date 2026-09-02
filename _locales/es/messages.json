@@ -17,9 +17,6 @@
     "btnNo": {
         "message": "No, gracias"
     },
-    "affiliateMessage": {
-        "message": "¿Te gusta NoReels? ¡Apoya el proyecto comprando cualquier producto en Amazon a través de este enlace!"
-    },
     "tierFree": {
         "message": "GRATIS"
     },
@@ -82,5 +79,71 @@
     },
     "upgradeBtn": {
         "message": "Obtener PRO"
+    },
+    "navStats": {
+        "message": "Análisis"
+    },
+    "configTitle": {
+        "message": "Configuración"
+    },
+    "configModalTitle": {
+        "message": "Configuración PRO"
+    },
+    "btnBack": {
+        "message": "← Volver"
+    },
+    "blockShorts": {
+        "message": "Bloquear Shorts"
+    },
+    "hideComments": {
+        "message": "Ocultar comentarios"
+    },
+    "homeRecs": {
+        "message": "Recomendaciones de inicio"
+    },
+    "videoRecs": {
+        "message": "Recomendaciones de video"
+    },
+    "blockReels": {
+        "message": "Bloquear Reels"
+    },
+    "blockStories": {
+        "message": "Bloquear Historias"
+    },
+    "lockTitle": {
+        "message": "Función Exclusiva PRO"
+    },
+    "lockDesc": {
+        "message": "Mira cuánto tiempo has ahorrado y sigue el historial por red social."
+    },
+    "btnUnlockStats": {
+        "message": "Desbloquear Análisis"
+    },
+    "generalMetrics": {
+        "message": "Métricas Generales"
+    },
+    "lblBlocked": {
+        "message": "Bloqueados:"
+    },
+    "lblTimeSaved": {
+        "message": "Tiempo Ahorrado:"
+    },
+    "breakdownTitle": {
+        "message": "Desglose por Plataforma"
+    },
+    "historyTitle": {
+        "message": "Historial Reciente"
+    },
+    "snoozeStatus": {
+        "message": "Pausado hasta reanudar"
+    },
+    "focusHoursLabel": {
+        "message": "Horario:"
+    },
+    "focusUntil": {
+        "message": "hasta"
+    },
+    "devBy": {
+        "message": "Desarrollado por Matheus Pedrosa"
     }
 }

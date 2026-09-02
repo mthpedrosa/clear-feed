@@ -17,9 +17,6 @@
     "btnNo": {
         "message": "No, thanks"
     },
-    "affiliateMessage": {
-        "message": "Like NoReels? Support the project by purchasing anything on Amazon through this link!"
-    },
     "tierFree": {
         "message": "FREE"
     },
@@ -82,5 +79,71 @@
     },
     "upgradeBtn": {
         "message": "Upgrade to PRO"
+    },
+    "navStats": {
+        "message": "Analytics"
+    },
+    "configTitle": {
+        "message": "Settings"
+    },
+    "configModalTitle": {
+        "message": "PRO Settings"
+    },
+    "btnBack": {
+        "message": "← Back"
+    },
+    "blockShorts": {
+        "message": "Block Shorts"
+    },
+    "hideComments": {
+        "message": "Hide Comments"
+    },
+    "homeRecs": {
+        "message": "Home Recommendations"
+    },
+    "videoRecs": {
+        "message": "Video Recommendations"
+    },
+    "blockReels": {
+        "message": "Block Reels"
+    },
+    "blockStories": {
+        "message": "Block Stories"
+    },
+    "lockTitle": {
+        "message": "Exclusive PRO Feature"
+    },
+    "lockDesc": {
+        "message": "Track time saved and view detailed history across social networks."
+    },
+    "btnUnlockStats": {
+        "message": "Unlock Analytics"
+    },
+    "generalMetrics": {
+        "message": "General Metrics"
+    },
+    "lblBlocked": {
+        "message": "Blocked:"
+    },
+    "lblTimeSaved": {
+        "message": "Time Saved:"
+    },
+    "breakdownTitle": {
+        "message": "Platform Breakdown"
+    },
+    "historyTitle": {
+        "message": "Recent Days History"
+    },
+    "snoozeStatus": {
+        "message": "Paused until resume"
+    },
+    "focusHoursLabel": {
+        "message": "Hours:"
+    },
+    "focusUntil": {
+        "message": "to"
+    },
+    "devBy": {
+        "message": "Developed by Matheus Pedrosa"
     }
 }
