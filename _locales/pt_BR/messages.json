@@ -19,5 +19,68 @@
     },
     "affiliateMessage": {
         "message": "Gosta do NoReels? Apoie o projeto comprando qualquer item na Amazon por este link!"
+    },
+    "tierFree": {
+        "message": "GRÁTIS"
+    },
+    "tierPro": {
+        "message": "PRO"
+    },
+    "toggleDevPro": {
+        "message": "Simular PRO"
+    },
+    "snoozeTitle": {
+        "message": "Pausa Temporária"
+    },
+    "snooze5m": {
+        "message": "5 min"
+    },
+    "snooze15m": {
+        "message": "15 min"
+    },
+    "snooze30m": {
+        "message": "30 min"
+    },
+    "snooze1h": {
+        "message": "1 hora"
+    },
+    "snoozeActive": {
+        "message": "Pausado por mais"
+    },
+    "btnResume": {
+        "message": "Reativar Agora"
+    },
+    "focusTitle": {
+        "message": "Modo Foco Programado"
+    },
+    "focusEnable": {
+        "message": "Ativar Agendamento"
+    },
+    "focusHours": {
+        "message": "Horário de Foco"
+    },
+    "focusDays": {
+        "message": "Dias Ativos"
+    },
+    "weekdays": {
+        "message": "Seg-Sex"
+    },
+    "everyday": {
+        "message": "Todos os dias"
+    },
+    "statsTitle": {
+        "message": "Estatísticas Avançadas"
+    },
+    "btnViewStats": {
+        "message": "Ver Painel de Estatísticas"
+    },
+    "statsModalTitle": {
+        "message": "Painel de Estatísticas"
+    },
+    "upgradeBanner": {
+        "message": "Desbloqueie Pausa Temporária, Modo Foco e Estatísticas Avançadas!"
+    },
+    "upgradeBtn": {
+        "message": "Upgrade para PRO"
     }
 }

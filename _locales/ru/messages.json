@@ -20,5 +20,68 @@
     ,
     "affiliateMessage": {
         "message": "Нравится NoReels? Поддержите проект, купив любой товар на Amazon по этой ссылке!"
+    },
+    "tierFree": {
+        "message": "БЕСПЛАТНО"
+    },
+    "tierPro": {
+        "message": "PRO"
+    },
+    "toggleDevPro": {
+        "message": "Симулировать PRO"
+    },
+    "snoozeTitle": {
+        "message": "Временная пауза"
+    },
+    "snooze5m": {
+        "message": "5 мин"
+    },
+    "snooze15m": {
+        "message": "15 мин"
+    },
+    "snooze30m": {
+        "message": "30 мин"
+    },
+    "snooze1h": {
+        "message": "1 час"
+    },
+    "snoozeActive": {
+        "message": "Пауза еще"
+    },
+    "btnResume": {
+        "message": "Возобновить сейчас"
+    },
+    "focusTitle": {
+        "message": "Режим фокуса"
+    },
+    "focusEnable": {
+        "message": "Включить расписание"
+    },
+    "focusHours": {
+        "message": "Часы фокуса"
+    },
+    "focusDays": {
+        "message": "Активные дни"
+    },
+    "weekdays": {
+        "message": "Пн-Пт"
+    },
+    "everyday": {
+        "message": "Каждый день"
+    },
+    "statsTitle": {
+        "message": "Расширенная статистика"
+    },
+    "btnViewStats": {
+        "message": "Открыть статистику"
+    },
+    "statsModalTitle": {
+        "message": "Панель статистики"
+    },
+    "upgradeBanner": {
+        "message": "Разблокируйте паузу, расписание фокуса и статистику!"
+    },
+    "upgradeBtn": {
+        "message": "Перейти на PRO"
     }
 }

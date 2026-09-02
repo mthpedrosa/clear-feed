@@ -19,5 +19,68 @@
     },
     "affiliateMessage": {
         "message": "Like NoReels? Support the project by purchasing anything on Amazon through this link!"
+    },
+    "tierFree": {
+        "message": "FREE"
+    },
+    "tierPro": {
+        "message": "PRO"
+    },
+    "toggleDevPro": {
+        "message": "Simulate PRO"
+    },
+    "snoozeTitle": {
+        "message": "Temporary Pause"
+    },
+    "snooze5m": {
+        "message": "5 min"
+    },
+    "snooze15m": {
+        "message": "15 min"
+    },
+    "snooze30m": {
+        "message": "30 min"
+    },
+    "snooze1h": {
+        "message": "1 hour"
+    },
+    "snoozeActive": {
+        "message": "Paused for another"
+    },
+    "btnResume": {
+        "message": "Resume Now"
+    },
+    "focusTitle": {
+        "message": "Scheduled Focus Mode"
+    },
+    "focusEnable": {
+        "message": "Enable Schedule"
+    },
+    "focusHours": {
+        "message": "Focus Hours"
+    },
+    "focusDays": {
+        "message": "Active Days"
+    },
+    "weekdays": {
+        "message": "Mon-Fri"
+    },
+    "everyday": {
+        "message": "Every day"
+    },
+    "statsTitle": {
+        "message": "Advanced Statistics"
+    },
+    "btnViewStats": {
+        "message": "View Analytics Dashboard"
+    },
+    "statsModalTitle": {
+        "message": "Analytics Dashboard"
+    },
+    "upgradeBanner": {
+        "message": "Unlock Temporary Pause, Focus Schedule & Advanced Analytics!"
+    },
+    "upgradeBtn": {
+        "message": "Upgrade to PRO"
     }
 }
