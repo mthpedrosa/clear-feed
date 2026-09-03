@@ -24,6 +24,11 @@ const SELECTORS = {
       'ytd-watch-next-secondary-results-renderer',
       '.html5-endscreen',
       'ytd-player #endscreen'
+    ],
+    games: [
+      'ytd-rich-section-renderer:has(a[href^="/playables"])',
+      'ytd-rich-shelf-renderer:has(a[href^="/playables"])',
+      'ytd-rich-section-renderer:has(ytd-mini-game-card-view-model)'
     ]
   },
   instagram: {
@@ -49,15 +54,18 @@ const SELECTORS = {
 
 let currentConfig = {
   blockYoutubeShorts: true,
+  blockYoutubeGames: true,
   blockYoutubeComments: false,
   blockYoutubeHome: false,
   blockYoutubeVideoRec: false,
   blockInstagramReels: true,
   blockFacebookReels: true,
   blockFacebookStories: false,
+  snoozeUntil: null,
   focusScheduleEnabled: false,
   focusStartTime: "09:00",
   focusEndTime: "17:00",
+  focusDays: [1, 2, 3, 4, 5],
   isPaidUser: false
 };
 
@@ -69,10 +77,23 @@ const getPlatform = () => {
   return null;
 };
 
+const isSnoozed = () => {
+  if (!currentConfig.isPaidUser) return false;
+  return currentConfig.snoozeUntil && Date.now() < currentConfig.snoozeUntil;
+};
+
 const isWithinFocusSchedule = () => {
-  if (!currentConfig.isPaidUser || !currentConfig.focusScheduleEnabled) return true; // Default behavior
+  if (!currentConfig.isPaidUser || !currentConfig.focusScheduleEnabled) return true;
 
   const now = new Date();
+  const currentDay = now.getDay();
+
+  if (Array.isArray(currentConfig.focusDays) && currentConfig.focusDays.length > 0) {
+    if (!currentConfig.focusDays.includes(currentDay)) {
+      return false;
+    }
+  }
+
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
   const [startH, startM] = (currentConfig.focusStartTime || "09:00").split(':').map(Number);
@@ -96,36 +117,39 @@ const injectStyles = () => {
   const existing = document.getElementById('noreels-fix-styles');
   if (existing) existing.remove();
 
+  if (isSnoozed() || !isWithinFocusSchedule()) {
+    return;
+  }
+
   const activeSelectors = [];
   let customCSS = '';
 
-  if (isWithinFocusSchedule()) {
-    if (platform === 'youtube') {
-      if (currentConfig.blockYoutubeShorts) activeSelectors.push(...SELECTORS.youtube.shorts);
-      if (currentConfig.blockYoutubeComments) activeSelectors.push(...SELECTORS.youtube.comments);
-      if (currentConfig.blockYoutubeHome) activeSelectors.push(...SELECTORS.youtube.home);
-      if (currentConfig.blockYoutubeVideoRec) {
-        activeSelectors.push(...SELECTORS.youtube.videoRec);
-        customCSS += `
-          #primary.ytd-watch-flexy {
-            max-width: 100% !important;
-            margin-left: auto !important;
-            margin-right: auto !important;
-            padding-right: 0 !important;
-          }
-          ytd-watch-flexy[flexy] #primary.ytd-watch-flexy {
-            margin-left: auto !important;
-            margin-right: auto !important;
-          }
-          #columns { justify-content: center !important; }
-        `;
-      }
-    } else if (platform === 'instagram') {
-      if (currentConfig.blockInstagramReels) activeSelectors.push(...SELECTORS.instagram.reels);
-    } else if (platform === 'facebook') {
-      if (currentConfig.blockFacebookReels) activeSelectors.push(...SELECTORS.facebook.reels);
-      if (currentConfig.blockFacebookStories) activeSelectors.push(...SELECTORS.facebook.stories);
+  if (platform === 'youtube') {
+    if (currentConfig.blockYoutubeShorts) activeSelectors.push(...SELECTORS.youtube.shorts);
+    if (currentConfig.blockYoutubeGames) activeSelectors.push(...SELECTORS.youtube.games);
+    if (currentConfig.blockYoutubeComments) activeSelectors.push(...SELECTORS.youtube.comments);
+    if (currentConfig.blockYoutubeHome) activeSelectors.push(...SELECTORS.youtube.home);
+    if (currentConfig.blockYoutubeVideoRec) {
+      activeSelectors.push(...SELECTORS.youtube.videoRec);
+      customCSS += `
+        #primary.ytd-watch-flexy {
+          max-width: 100% !important;
+          margin-left: auto !important;
+          margin-right: auto !important;
+          padding-right: 0 !important;
+        }
+        ytd-watch-flexy[flexy] #primary.ytd-watch-flexy {
+          margin-left: auto !important;
+          margin-right: auto !important;
+        }
+        #columns { justify-content: center !important; }
+      `;
     }
+  } else if (platform === 'instagram') {
+    if (currentConfig.blockInstagramReels) activeSelectors.push(...SELECTORS.instagram.reels);
+  } else if (platform === 'facebook') {
+    if (currentConfig.blockFacebookReels) activeSelectors.push(...SELECTORS.facebook.reels);
+    if (currentConfig.blockFacebookStories) activeSelectors.push(...SELECTORS.facebook.stories);
   }
 
   const style = document.createElement('style');
@@ -137,22 +161,35 @@ const injectStyles = () => {
   (document.head || document.documentElement).appendChild(style);
 };
 
-const updateMetrics = (blockedCount) => {
-  chrome.storage.local.get(['totalBlocked'], (result) => {
+const updateMetrics = (platform, blockedCount) => {
+  chrome.storage.local.get(['totalBlocked', 'statsByPlatform', 'statsHistory'], (result) => {
     const totalBlocked = (result.totalBlocked || 0) + blockedCount;
-    chrome.storage.local.set({ totalBlocked });
+
+    const statsByPlatform = result.statsByPlatform || { youtube: 0, instagram: 0, facebook: 0 };
+    statsByPlatform[platform] = (statsByPlatform[platform] || 0) + blockedCount;
+
+    const todayStr = new Date().toISOString().split('T')[0];
+    const statsHistory = result.statsHistory || {};
+    if (!statsHistory[todayStr]) {
+      statsHistory[todayStr] = { youtube: 0, instagram: 0, facebook: 0 };
+    }
+    statsHistory[todayStr][platform] = (statsHistory[todayStr][platform] || 0) + blockedCount;
+
+    chrome.storage.local.set({ totalBlocked, statsByPlatform, statsHistory });
   });
 };
 
 const processBlocks = () => {
   const platform = getPlatform();
   if (!platform) return;
+  if (isSnoozed() || !isWithinFocusSchedule()) return;
 
   let newlyBlocked = 0;
   const selectorsToCount = [];
 
-  if (platform === 'youtube' && currentConfig.blockYoutubeShorts) {
-    selectorsToCount.push(...SELECTORS.youtube.shorts);
+  if (platform === 'youtube') {
+    if (currentConfig.blockYoutubeShorts) selectorsToCount.push(...SELECTORS.youtube.shorts);
+    if (currentConfig.blockYoutubeGames) selectorsToCount.push(...SELECTORS.youtube.games);
   } else if (platform === 'instagram' && currentConfig.blockInstagramReels) {
     selectorsToCount.push(...SELECTORS.instagram.reels);
   } else if (platform === 'facebook') {
@@ -169,28 +206,42 @@ const processBlocks = () => {
   });
 
   if (newlyBlocked > 0) {
-    updateMetrics(newlyBlocked);
+    updateMetrics(platform, newlyBlocked);
   }
 };
 
 const loadConfig = () => {
   chrome.storage.local.get([
     'blockYoutubeShorts', 
+    'blockYoutubeGames',
     'blockYoutubeComments',
     'blockYoutubeHome',
     'blockYoutubeVideoRec',
     'blockInstagramReels', 
     'blockFacebookReels',
-    'blockFacebookStories'
+    'blockFacebookStories',
+    'snoozeUntil',
+    'focusScheduleEnabled',
+    'focusStartTime',
+    'focusEndTime',
+    'focusDays',
+    'isPaidUser'
   ], (result) => {
     currentConfig = {
       blockYoutubeShorts: result.blockYoutubeShorts !== false,
+      blockYoutubeGames: result.blockYoutubeGames !== false,
       blockYoutubeComments: result.blockYoutubeComments === true,
       blockYoutubeHome: result.blockYoutubeHome === true,
       blockYoutubeVideoRec: result.blockYoutubeVideoRec === true,
       blockInstagramReels: result.blockInstagramReels !== false,
       blockFacebookReels: result.blockFacebookReels !== false,
-      blockFacebookStories: result.blockFacebookStories === true
+      blockFacebookStories: result.blockFacebookStories === true,
+      snoozeUntil: result.snoozeUntil || null,
+      focusScheduleEnabled: result.focusScheduleEnabled === true,
+      focusStartTime: result.focusStartTime || "09:00",
+      focusEndTime: result.focusEndTime || "17:00",
+      focusDays: result.focusDays || [1, 2, 3, 4, 5],
+      isPaidUser: result.isPaidUser === true
     };
     injectStyles();
     processBlocks();
@@ -199,13 +250,20 @@ const loadConfig = () => {
 
 chrome.storage.onChanged.addListener((changes) => {
   let changed = false;
-  if (changes.blockYoutubeShorts) { currentConfig.blockYoutubeShorts = changes.blockYoutubeShorts.newValue; changed = true; }
-  if (changes.blockYoutubeComments) { currentConfig.blockYoutubeComments = changes.blockYoutubeComments.newValue; changed = true; }
-  if (changes.blockYoutubeHome) { currentConfig.blockYoutubeHome = changes.blockYoutubeHome.newValue; changed = true; }
-  if (changes.blockYoutubeVideoRec) { currentConfig.blockYoutubeVideoRec = changes.blockYoutubeVideoRec.newValue; changed = true; }
-  if (changes.blockInstagramReels) { currentConfig.blockInstagramReels = changes.blockInstagramReels.newValue; changed = true; }
-  if (changes.blockFacebookReels) { currentConfig.blockFacebookReels = changes.blockFacebookReels.newValue; changed = true; }
-  if (changes.blockFacebookStories) { currentConfig.blockFacebookStories = changes.blockFacebookStories.newValue; changed = true; }
+  if (changes.blockYoutubeShorts !== undefined) { currentConfig.blockYoutubeShorts = changes.blockYoutubeShorts.newValue; changed = true; }
+  if (changes.blockYoutubeGames !== undefined) { currentConfig.blockYoutubeGames = changes.blockYoutubeGames.newValue; changed = true; }
+  if (changes.blockYoutubeComments !== undefined) { currentConfig.blockYoutubeComments = changes.blockYoutubeComments.newValue; changed = true; }
+  if (changes.blockYoutubeHome !== undefined) { currentConfig.blockYoutubeHome = changes.blockYoutubeHome.newValue; changed = true; }
+  if (changes.blockYoutubeVideoRec !== undefined) { currentConfig.blockYoutubeVideoRec = changes.blockYoutubeVideoRec.newValue; changed = true; }
+  if (changes.blockInstagramReels !== undefined) { currentConfig.blockInstagramReels = changes.blockInstagramReels.newValue; changed = true; }
+  if (changes.blockFacebookReels !== undefined) { currentConfig.blockFacebookReels = changes.blockFacebookReels.newValue; changed = true; }
+  if (changes.blockFacebookStories !== undefined) { currentConfig.blockFacebookStories = changes.blockFacebookStories.newValue; changed = true; }
+  if (changes.snoozeUntil !== undefined) { currentConfig.snoozeUntil = changes.snoozeUntil.newValue; changed = true; }
+  if (changes.focusScheduleEnabled !== undefined) { currentConfig.focusScheduleEnabled = changes.focusScheduleEnabled.newValue; changed = true; }
+  if (changes.focusStartTime !== undefined) { currentConfig.focusStartTime = changes.focusStartTime.newValue; changed = true; }
+  if (changes.focusEndTime !== undefined) { currentConfig.focusEndTime = changes.focusEndTime.newValue; changed = true; }
+  if (changes.focusDays !== undefined) { currentConfig.focusDays = changes.focusDays.newValue; changed = true; }
+  if (changes.isPaidUser !== undefined) { currentConfig.isPaidUser = changes.isPaidUser.newValue; changed = true; }
   
   if (changed) {
     injectStyles();

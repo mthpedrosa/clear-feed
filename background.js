@@ -5,15 +5,12 @@ const CONFIG = {
 
 chrome.runtime.onInstalled.addListener((details) => {
   // Only open welcome page if we don't already have an installDate stored.
-  // This prevents opening the site for users who already had a previous install.
   chrome.storage.local.get('installDate', (res) => {
     const hasInstallDate = !!res && !!res.installDate;
 
     if (!hasInstallDate) {
-      // Mark install date for future checks
       chrome.storage.local.set({ installDate: new Date().toISOString() });
 
-      // Only open welcome page when the runtime reports a fresh install
       if (details.reason === 'install') {
         chrome.tabs.create({ url: CONFIG.welcomeUrl });
       }
@@ -22,3 +19,13 @@ chrome.runtime.onInstalled.addListener((details) => {
 
   console.log('NoReels extension installed.');
 });
+
+// Handle alarm events (e.g. Temporary Pause expiration)
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === 'endSnooze') {
+    chrome.storage.local.remove('snoozeUntil', () => {
+      console.log('NoReels: Temporary pause ended. Blocking resumed.');
+    });
+  }
+});
+
