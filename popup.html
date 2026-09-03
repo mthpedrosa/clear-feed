@@ -59,72 +59,6 @@
       color: #666;
     }
 
-    .tier-badge.pro {
-      background: linear-gradient(135deg, #FF9800, #FF5722);
-      color: #ffffff;
-      box-shadow: 0 2px 4px rgba(255, 152, 0, 0.3);
-    }
-
-    .dev-toggle-container {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 10px;
-      color: #888;
-    }
-
-    .pro-tag {
-      background: #ff9800;
-      color: #fff;
-      border-radius: 4px;
-      font-size: 9px;
-      padding: 1px 5px;
-      font-weight: 600;
-      text-transform: uppercase;
-    }
-
-    .pro-locked-mask {
-      opacity: 0.5;
-      pointer-events: none;
-      user-select: none;
-    }
-
-    .upgrade-box {
-      background: linear-gradient(135deg, #fff3e0, #ffe0b2);
-      border: 1px solid #ffb74d;
-      border-radius: 8px;
-      padding: 10px;
-      text-align: center;
-      margin-bottom: 12px;
-      font-size: 12px;
-      color: #e65100;
-    }
-
-    .upgrade-box p {
-      margin: 0 0 6px 0;
-      font-weight: 600;
-    }
-
-    .btn-upgrade {
-      background: #ff9800;
-      color: #ffffff;
-      border: none;
-      padding: 5px 12px;
-      border-radius: 6px;
-      font-weight: 600;
-      font-size: 11px;
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-block;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      transition: transform 0.1s;
-    }
-
-    .btn-upgrade:hover {
-      background: #f57c00;
-      transform: translateY(-1px);
-    }
-
     .header-actions {
       display: flex;
       align-items: center;
@@ -286,78 +220,6 @@
       font-weight: 600;
       color: #555;
       margin-bottom: 6px;
-    }
-
-    /* Pro Analytics Blur Lock */
-    .stats-container-rel {
-      position: relative;
-      min-height: 200px;
-    }
-
-    .stats-blur-content {
-      transition: filter 0.25s ease, opacity 0.25s ease;
-    }
-
-    .stats-blur-content.blurred {
-      filter: blur(5px);
-      opacity: 0.4;
-      pointer-events: none;
-      user-select: none;
-    }
-
-    .stats-lock-overlay {
-      display: none;
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 14px;
-      z-index: 5;
-    }
-
-    .stats-lock-overlay.active {
-      display: flex;
-    }
-
-    .stats-lock-icon {
-      font-size: 24px;
-      margin-bottom: 6px;
-    }
-
-    .stats-lock-title {
-      font-size: 13px;
-      font-weight: 600;
-      color: #111;
-      margin-bottom: 4px;
-    }
-
-    .stats-lock-desc {
-      font-size: 11px;
-      color: #555;
-      margin-bottom: 12px;
-      line-height: 1.3;
-    }
-
-    .btn-unlock-stats {
-      background: linear-gradient(135deg, #ff9800, #f57c00);
-      color: #ffffff;
-      border: none;
-      padding: 7px 16px;
-      border-radius: 6px;
-      font-weight: 600;
-      font-size: 11px;
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(245, 124, 0, 0.3);
-      transition: transform 0.1s;
-    }
-
-    .btn-unlock-stats:hover {
-      transform: translateY(-1px);
     }
 
     .tabs-content {
@@ -700,7 +562,6 @@
     <div class="header-left">
       <img src="images/icon.png" alt="NoReels Logo">
       <h2>NoReels</h2>
-      <span id="tier-badge" class="tier-badge free">FREE</span>
     </div>
     <div class="header-actions">
       <button id="btn-open-stats" class="header-nav-btn" data-panel="panel-stats">
@@ -708,22 +569,14 @@
           <path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/>
         </svg>
         <span id="lbl-nav-stats">Análise</span>
-        <span class="pro-tag" style="font-size: 8px; padding: 0 3px; line-height: 12px;">PRO</span>
       </button>
 
       <button id="btn-open-config" class="header-nav-btn" data-panel="panel-config" title="Configurações">
         <svg class="header-nav-icon config-icon-color" viewBox="0 0 24 24">
           <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
         </svg>
-        <span class="pro-tag" style="font-size: 8px; padding: 0 3px; line-height: 12px;">PRO</span>
       </button>
     </div>
-  </div>
-
-  <!-- Upgrade Banner on Home for Free Users -->
-  <div id="upgrade-banner" class="upgrade-box">
-    <p id="msg-upgrade-banner">Desbloqueie Pausa Temporária, Modo Foco e Estatísticas!</p>
-    <button id="btn-upgrade-action" class="btn-upgrade">Ativar Modo PRO</button>
   </div>
 
   <!-- Main View: Social Media Configs in a Single Column -->
@@ -814,13 +667,6 @@
       <img src="images/linkedin.png" alt="LinkedIn">
       <span id="lbl-dev-name">Developed by Matheus Pedrosa</span>
     </a>
-    <div class="dev-toggle-container">
-      <label class="switch" style="width: 24px; height: 14px;">
-        <input type="checkbox" id="toggle-pro-mode">
-        <span class="slider" style="border-radius: 14px;"></span>
-      </label>
-      <span id="lbl-dev-pro">Simular PRO</span>
-    </div>
   </div>
 
   <!-- Panel: Análises Overlay -->
@@ -831,22 +677,14 @@
       </button>
       <div class="view-title-group">
         <span id="lbl-stats-modal-title" style="font-weight: 600; font-size: 13px;">Estatísticas & Análise</span>
-        <span id="tag-stats-pro" class="pro-tag">PRO</span>
       </div>
       <button class="btn-close-modal" data-close="panel-stats">&times;</button>
     </div>
 
-    <div class="stats-container-rel">
-      <!-- Blur Lock Overlay for Free users -->
-      <div id="stats-lock-overlay" class="stats-lock-overlay active">
-        <div class="stats-lock-icon">🔒</div>
-        <div id="lbl-lock-title" class="stats-lock-title">Recurso Exclusivo PRO</div>
-        <div id="lbl-lock-desc" class="stats-lock-desc">Veja quanto tempo você economizou e acompanhe o histórico por rede social.</div>
-        <button id="btn-unlock-stats" class="btn-unlock-stats">Desbloquear Análise</button>
-      </div>
 
+    <div class="stats-container-rel">
       <!-- Stats Content (Blurred when Free) -->
-      <div id="stats-blur-content" class="stats-blur-content blurred">
+      <div id="stats-blur-content">
         <div class="stats-sub-header">
           <span id="lbl-general-metrics">Métricas Gerais</span>
         </div>
@@ -892,8 +730,7 @@
         <span class="lbl-btn-back">← Voltar</span>
       </button>
       <div class="view-title-group">
-        <span id="lbl-config-title" style="font-weight: 600; font-size: 13px;">Configurações PRO</span>
-        <span class="pro-tag">PRO</span>
+        <span id="lbl-config-title" style="font-weight: 600; font-size: 13px;">Configurações</span>
       </div>
       <button class="btn-close-modal" data-close="panel-config">&times;</button>
     </div>
@@ -902,9 +739,8 @@
     <div id="sec-snooze" style="margin-top: 6px;">
       <div class="stats-sub-header">
         <span id="lbl-snooze-title">Pausa Temporária</span>
-        <span id="tag-snooze-pro" class="pro-tag">PRO</span>
       </div>
-      <div id="snooze-content" class="pro-locked-mask">
+      <div id="snooze-content">
         <div id="snooze-controls" class="snooze-grid">
           <button class="btn-snooze" data-minutes="5">5 min</button>
           <button class="btn-snooze" data-minutes="15">15 min</button>
@@ -923,9 +759,8 @@
     <div id="sec-focus" style="border-top: 1px dashed #eee; padding-top: 10px; margin-top: 14px;">
       <div class="stats-sub-header">
         <span id="lbl-focus-title">Modo Foco Programado</span>
-        <span id="tag-focus-pro" class="pro-tag">PRO</span>
       </div>
-      <div id="focus-content" class="pro-locked-mask">
+      <div id="focus-content">
         <div class="control-item">
           <span id="lbl-focus-enable">Ativar Agendamento</span>
           <label class="switch">

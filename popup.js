@@ -71,56 +71,6 @@ function updateUI() {
   ]);
 
   chrome.storage.local.get(storageKeys, (result) => {
-    const isPaidUser = result.isPaidUser === true;
-
-    // 1. Tier Badge & Dev Toggle
-    const tierBadgeEl = document.getElementById('tier-badge');
-    const toggleProModeEl = document.getElementById('toggle-pro-mode');
-    const upgradeBannerEl = document.getElementById('upgrade-banner');
-
-    if (toggleProModeEl) toggleProModeEl.checked = isPaidUser;
-
-    if (tierBadgeEl) {
-      if (isPaidUser) {
-        tierBadgeEl.textContent = chrome.i18n ? (chrome.i18n.getMessage('tierPro') || 'PRO') : 'PRO';
-        tierBadgeEl.className = 'tier-badge pro';
-      } else {
-        tierBadgeEl.textContent = chrome.i18n ? (chrome.i18n.getMessage('tierFree') || 'FREE') : 'FREE';
-        tierBadgeEl.className = 'tier-badge free';
-      }
-    }
-
-    if (upgradeBannerEl) {
-      upgradeBannerEl.style.display = isPaidUser ? 'none' : 'block';
-    }
-
-    // 2. Lock / Unlock PRO Feature Sections
-    const snoozeContentEl = document.getElementById('snooze-content');
-    const focusContentEl = document.getElementById('focus-content');
-    const tagSnoozePro = document.getElementById('tag-snooze-pro');
-    const tagFocusPro = document.getElementById('tag-focus-pro');
-    const tagStatsPro = document.getElementById('tag-stats-pro');
-    const statsBlurContent = document.getElementById('stats-blur-content');
-    const statsLockOverlay = document.getElementById('stats-lock-overlay');
-
-    if (isPaidUser) {
-      if (snoozeContentEl) snoozeContentEl.classList.remove('pro-locked-mask');
-      if (focusContentEl) focusContentEl.classList.remove('pro-locked-mask');
-      if (statsBlurContent) statsBlurContent.classList.remove('blurred');
-      if (statsLockOverlay) statsLockOverlay.classList.remove('active');
-      if (tagSnoozePro) tagSnoozePro.style.display = 'none';
-      if (tagFocusPro) tagFocusPro.style.display = 'none';
-      if (tagStatsPro) tagStatsPro.style.display = 'none';
-    } else {
-      if (snoozeContentEl) snoozeContentEl.classList.add('pro-locked-mask');
-      if (focusContentEl) focusContentEl.classList.add('pro-locked-mask');
-      if (statsBlurContent) statsBlurContent.classList.add('blurred');
-      if (statsLockOverlay) statsLockOverlay.classList.add('active');
-      if (tagSnoozePro) tagSnoozePro.style.display = 'inline-block';
-      if (tagFocusPro) tagFocusPro.style.display = 'inline-block';
-      if (tagStatsPro) tagStatsPro.style.display = 'inline-block';
-    }
-
     // 3. Load Standard Toggles
     Object.entries(CONFIG_KEYS).forEach(([elementId, storageKey]) => {
       const defaultTrue = ['blockYoutubeShorts', 'blockInstagramReels', 'blockFacebookReels'].includes(storageKey);
@@ -229,36 +179,10 @@ function setupEventListeners() {
     }
   });
 
-  // Toggle Dev PRO Mode
-  const toggleProModeEl = document.getElementById('toggle-pro-mode');
-  if (toggleProModeEl) {
-    toggleProModeEl.addEventListener('change', (e) => {
-      chrome.storage.local.set({ isPaidUser: e.target.checked }, () => {
-        updateUI();
-      });
-    });
-  }
-
-  // Upgrade Button Action
-  const btnUpgradeAction = document.getElementById('btn-upgrade-action');
-  if (btnUpgradeAction) {
-    btnUpgradeAction.addEventListener('click', () => {
-      // For dev/demo: Activate Pro mode
-      chrome.storage.local.set({ isPaidUser: true }, () => {
-        updateUI();
-      });
-    });
-  }
-
   // Temporary Pause (Snooze) Buttons
   const snoozeButtons = document.querySelectorAll('.btn-snooze');
   snoozeButtons.forEach(btn => {
     btn.addEventListener('click', (e) => {
-      chrome.storage.local.get(['isPaidUser'], (res) => {
-        if (!res.isPaidUser) {
-          alert("A Pausa Temporária é um recurso PRO!");
-          return;
-        }
         const minutes = parseInt(e.target.getAttribute('data-minutes'), 10) || 5;
         const snoozeUntil = Date.now() + minutes * 60 * 1000;
 
@@ -268,7 +192,6 @@ function setupEventListeners() {
           }
           updateUI();
         });
-      });
     });
   });
 
@@ -289,14 +212,7 @@ function setupEventListeners() {
   const focusEnabledEl = document.getElementById('focus-schedule-enabled');
   if (focusEnabledEl) {
     focusEnabledEl.addEventListener('change', (e) => {
-      chrome.storage.local.get(['isPaidUser'], (res) => {
-        if (!res.isPaidUser && e.target.checked) {
-          alert("O Modo Foco Programado é um recurso PRO!");
-          e.target.checked = false;
-          return;
-        }
-        chrome.storage.local.set({ focusScheduleEnabled: e.target.checked });
-      });
+      chrome.storage.local.set({ focusScheduleEnabled: e.target.checked });
     });
   }
 
@@ -318,28 +234,16 @@ function setupEventListeners() {
   const dayButtons = document.querySelectorAll('.btn-day');
   dayButtons.forEach(btn => {
     btn.addEventListener('click', () => {
-      chrome.storage.local.get(['isPaidUser', 'focusDays'], (res) => {
-        if (!res.isPaidUser) {
-          alert("O Modo Foco Programado é um recurso PRO!");
-          return;
-        }
-        btn.classList.toggle('active');
-        const activeDays = [];
-        document.querySelectorAll('.btn-day.active').forEach(b => {
-          activeDays.push(parseInt(b.getAttribute('data-day'), 10));
-        });
-        chrome.storage.local.set({ focusDays: activeDays });
+      btn.classList.toggle('active');
+      const activeDays = [];
+      document.querySelectorAll('.btn-day.active').forEach(b => {
+        activeDays.push(parseInt(b.getAttribute('data-day'), 10));
       });
+      chrome.storage.local.set({ focusDays: activeDays });
     });
   });
 
-  const btnUnlockStats = document.getElementById('btn-unlock-stats');
-  if (btnUnlockStats) {
-    btnUnlockStats.addEventListener('click', () => {
-      const btnUpgrade = document.getElementById('btn-upgrade-action');
-      if (btnUpgrade) btnUpgrade.click();
-    });
-  }
+
 
   // Header Navigation & Panel Overlays (Análise & Config)
   const headerNavButtons = document.querySelectorAll('.header-nav-btn');
@@ -404,9 +308,6 @@ function applyI18nTranslations() {
   // Header & Home
   setI18nText('lbl-nav-stats', 'navStats');
   setI18nTitle('btn-open-config', 'configTitle');
-  setI18nText('msg-upgrade-banner', 'upgradeBanner');
-  setI18nText('btn-upgrade-action', 'upgradeBtn');
-  setI18nText('lbl-dev-pro', 'toggleDevPro');
   setI18nText('lbl-dev-name', 'devBy');
 
   // Social Network Controls
@@ -427,9 +328,6 @@ function applyI18nTranslations() {
 
   // Analytics Overlay
   setI18nText('lbl-stats-modal-title', 'statsModalTitle');
-  setI18nText('lbl-lock-title', 'lockTitle');
-  setI18nText('lbl-lock-desc', 'lockDesc');
-  setI18nText('btn-unlock-stats', 'btnUnlockStats');
   setI18nText('lbl-general-metrics', 'generalMetrics');
   setI18nText('lbl-blocked', 'lblBlocked');
   setI18nText('lbl-time-saved', 'lblTimeSaved');
