@@ -24,6 +24,11 @@ const SELECTORS = {
       'ytd-watch-next-secondary-results-renderer',
       '.html5-endscreen',
       'ytd-player #endscreen'
+    ],
+    games: [
+      'ytd-rich-section-renderer:has(a[href^="/playables"])',
+      'ytd-rich-shelf-renderer:has(a[href^="/playables"])',
+      'ytd-rich-section-renderer:has(ytd-mini-game-card-view-model)'
     ]
   },
   instagram: {
@@ -49,6 +54,7 @@ const SELECTORS = {
 
 let currentConfig = {
   blockYoutubeShorts: true,
+  blockYoutubeGames: true,
   blockYoutubeComments: false,
   blockYoutubeHome: false,
   blockYoutubeVideoRec: false,
@@ -120,6 +126,7 @@ const injectStyles = () => {
 
   if (platform === 'youtube') {
     if (currentConfig.blockYoutubeShorts) activeSelectors.push(...SELECTORS.youtube.shorts);
+    if (currentConfig.blockYoutubeGames) activeSelectors.push(...SELECTORS.youtube.games);
     if (currentConfig.blockYoutubeComments) activeSelectors.push(...SELECTORS.youtube.comments);
     if (currentConfig.blockYoutubeHome) activeSelectors.push(...SELECTORS.youtube.home);
     if (currentConfig.blockYoutubeVideoRec) {
@@ -180,8 +187,9 @@ const processBlocks = () => {
   let newlyBlocked = 0;
   const selectorsToCount = [];
 
-  if (platform === 'youtube' && currentConfig.blockYoutubeShorts) {
-    selectorsToCount.push(...SELECTORS.youtube.shorts);
+  if (platform === 'youtube') {
+    if (currentConfig.blockYoutubeShorts) selectorsToCount.push(...SELECTORS.youtube.shorts);
+    if (currentConfig.blockYoutubeGames) selectorsToCount.push(...SELECTORS.youtube.games);
   } else if (platform === 'instagram' && currentConfig.blockInstagramReels) {
     selectorsToCount.push(...SELECTORS.instagram.reels);
   } else if (platform === 'facebook') {
@@ -205,6 +213,7 @@ const processBlocks = () => {
 const loadConfig = () => {
   chrome.storage.local.get([
     'blockYoutubeShorts', 
+    'blockYoutubeGames',
     'blockYoutubeComments',
     'blockYoutubeHome',
     'blockYoutubeVideoRec',
@@ -220,6 +229,7 @@ const loadConfig = () => {
   ], (result) => {
     currentConfig = {
       blockYoutubeShorts: result.blockYoutubeShorts !== false,
+      blockYoutubeGames: result.blockYoutubeGames !== false,
       blockYoutubeComments: result.blockYoutubeComments === true,
       blockYoutubeHome: result.blockYoutubeHome === true,
       blockYoutubeVideoRec: result.blockYoutubeVideoRec === true,
@@ -241,6 +251,7 @@ const loadConfig = () => {
 chrome.storage.onChanged.addListener((changes) => {
   let changed = false;
   if (changes.blockYoutubeShorts !== undefined) { currentConfig.blockYoutubeShorts = changes.blockYoutubeShorts.newValue; changed = true; }
+  if (changes.blockYoutubeGames !== undefined) { currentConfig.blockYoutubeGames = changes.blockYoutubeGames.newValue; changed = true; }
   if (changes.blockYoutubeComments !== undefined) { currentConfig.blockYoutubeComments = changes.blockYoutubeComments.newValue; changed = true; }
   if (changes.blockYoutubeHome !== undefined) { currentConfig.blockYoutubeHome = changes.blockYoutubeHome.newValue; changed = true; }
   if (changes.blockYoutubeVideoRec !== undefined) { currentConfig.blockYoutubeVideoRec = changes.blockYoutubeVideoRec.newValue; changed = true; }

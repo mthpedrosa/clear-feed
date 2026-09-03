@@ -145,5 +145,8 @@
     },
     "devBy": {
         "message": "Desenvolvido por Matheus Pedrosa"
+    },
+    "blockGames": {
+        "message": "Ocultar Jogos"
     }
 }

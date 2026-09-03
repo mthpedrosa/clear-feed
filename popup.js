@@ -2,6 +2,7 @@ const AVG_REEL_TIME_SECONDS = 30;
 
 const CONFIG_KEYS = {
   'yt-shorts': 'blockYoutubeShorts',
+  'yt-games': 'blockYoutubeGames',
   'yt-comments': 'blockYoutubeComments',
   'yt-home': 'blockYoutubeHome',
   'yt-video-rec': 'blockYoutubeVideoRec',
@@ -73,7 +74,7 @@ function updateUI() {
   chrome.storage.local.get(storageKeys, (result) => {
     // 3. Load Standard Toggles
     Object.entries(CONFIG_KEYS).forEach(([elementId, storageKey]) => {
-      const defaultTrue = ['blockYoutubeShorts', 'blockInstagramReels', 'blockFacebookReels'].includes(storageKey);
+      const defaultTrue = ['blockYoutubeShorts', 'blockYoutubeGames', 'blockInstagramReels', 'blockFacebookReels'].includes(storageKey);
       const isEnabled = result[storageKey] !== undefined ? result[storageKey] : defaultTrue;
       const el = document.getElementById(elementId);
       if (el) el.checked = isEnabled;
@@ -312,6 +313,7 @@ function applyI18nTranslations() {
 
   // Social Network Controls
   setI18nText('lbl-yt-shorts', 'blockShorts');
+  setI18nText('lbl-yt-games', 'blockGames');
   setI18nText('lbl-yt-comments', 'hideComments');
   setI18nText('lbl-yt-home', 'homeRecs');
   setI18nText('lbl-yt-video-rec', 'videoRecs');
