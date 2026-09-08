@@ -184,15 +184,15 @@ function setupEventListeners() {
   const snoozeButtons = document.querySelectorAll('.btn-snooze');
   snoozeButtons.forEach(btn => {
     btn.addEventListener('click', (e) => {
-        const minutes = parseInt(e.target.getAttribute('data-minutes'), 10) || 5;
-        const snoozeUntil = Date.now() + minutes * 60 * 1000;
+      const minutes = parseInt(e.target.getAttribute('data-minutes'), 10) || 5;
+      const snoozeUntil = Date.now() + minutes * 60 * 1000;
 
-        chrome.storage.local.set({ snoozeUntil }, () => {
-          if (chrome.alarms) {
-            chrome.alarms.create('endSnooze', { when: snoozeUntil });
-          }
-          updateUI();
-        });
+      chrome.storage.local.set({ snoozeUntil }, () => {
+        if (chrome.alarms) {
+          chrome.alarms.create('endSnooze', { when: snoozeUntil });
+        }
+        updateUI();
+      });
     });
   });
 
@@ -351,4 +351,19 @@ document.addEventListener('DOMContentLoaded', () => {
   updateUI();
   setupEventListeners();
   applyI18nTranslations();
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  updateUI();
+  setupEventListeners();
+  applyI18nTranslations();
+
+  // Load AdsOnBread
+  const adContainer = document.getElementById('ad-slot');
+  if (adContainer && typeof AdsOnBread !== 'undefined') {
+    AdsOnBread.load('b84f1d67-0435-4fe5-8498-3bb6f7a1ee1f', 'banner', adContainer, {
+      theme: 'dark', // can use 'dark' too
+      language: chrome.i18n.getUILanguage()
+    });
+  }
 });
