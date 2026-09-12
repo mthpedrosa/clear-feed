@@ -81,19 +81,22 @@
         "message": "Bloquear Shorts"
     },
     "hideComments": {
-        "message": "Ocultar comentarios"
+        "message": "Bloquear Comentarios"
     },
     "homeRecs": {
-        "message": "Recomendaciones de inicio"
+        "message": "Bloquear Recomendaciones de Inicio"
     },
     "videoRecs": {
-        "message": "Recomendaciones de video"
+        "message": "Bloquear Recomendaciones de Video"
     },
     "blockReels": {
         "message": "Bloquear Reels"
     },
     "blockStories": {
-        "message": "Bloquear Historias"
+        "message": "Bloquear Stories"
+    },
+    "blockGames": {
+        "message": "Bloquear Juegos"
     },
     "lockTitle": {
         "message": "Función Exclusiva PRO"
@@ -135,6 +138,9 @@
         "message": "Ocultar Juegos"
     },
     "showExtensionIcon": {
-        "message": "Mostrar icono de extensión en los sitios"
+        "message": "Mostrar icono de la extensión en los sitios"
+    },
+    "removeMenuWarning": {
+        "message": "Puedes ocultar este menú en la configuración de la extensión."
     }
 }
