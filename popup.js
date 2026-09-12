@@ -8,7 +8,8 @@ const CONFIG_KEYS = {
   'yt-video-rec': 'blockYoutubeVideoRec',
   'ig-reels': 'blockInstagramReels',
   'fb-reels': 'blockFacebookReels',
-  'fb-stories': 'blockFacebookStories'
+  'fb-stories': 'blockFacebookStories',
+  'show-extension-icon': 'showExtensionIcon'
 };
 
 let snoozeTimerInterval = null;
@@ -74,7 +75,7 @@ function updateUI() {
   chrome.storage.local.get(storageKeys, (result) => {
     // 3. Load Standard Toggles
     Object.entries(CONFIG_KEYS).forEach(([elementId, storageKey]) => {
-      const defaultTrue = ['blockYoutubeShorts', 'blockYoutubeGames', 'blockInstagramReels', 'blockFacebookReels'].includes(storageKey);
+      const defaultTrue = ['blockYoutubeShorts', 'blockYoutubeGames', 'blockInstagramReels', 'blockFacebookReels', 'showExtensionIcon'].includes(storageKey);
       const isEnabled = result[storageKey] !== undefined ? result[storageKey] : defaultTrue;
       const el = document.getElementById(elementId);
       if (el) el.checked = isEnabled;
@@ -345,13 +346,8 @@ function applyI18nTranslations() {
   setI18nText('lbl-focus-enable', 'focusEnable');
   setI18nText('lbl-focus-hours', 'focusHoursLabel');
   setI18nText('lbl-focus-until', 'focusUntil');
+  setI18nText('lbl-show-icon', 'showExtensionIcon');
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-  updateUI();
-  setupEventListeners();
-  applyI18nTranslations();
-});
 
 document.addEventListener('DOMContentLoaded', () => {
   updateUI();

@@ -148,5 +148,8 @@
     },
     "blockGames": {
         "message": "Ocultar Jogos"
+    },
+    "showExtensionIcon": {
+        "message": "Mostrar ícone da extensão nos sites"
     }
 }
