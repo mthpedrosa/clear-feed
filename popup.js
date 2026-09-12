@@ -8,7 +8,8 @@ const CONFIG_KEYS = {
   'yt-video-rec': 'blockYoutubeVideoRec',
   'ig-reels': 'blockInstagramReels',
   'fb-reels': 'blockFacebookReels',
-  'fb-stories': 'blockFacebookStories'
+  'fb-stories': 'blockFacebookStories',
+  'show-extension-icon': 'showExtensionIcon'
 };
 
 let snoozeTimerInterval = null;
@@ -74,7 +75,7 @@ function updateUI() {
   chrome.storage.local.get(storageKeys, (result) => {
     // 3. Load Standard Toggles
     Object.entries(CONFIG_KEYS).forEach(([elementId, storageKey]) => {
-      const defaultTrue = ['blockYoutubeShorts', 'blockYoutubeGames', 'blockInstagramReels', 'blockFacebookReels'].includes(storageKey);
+      const defaultTrue = ['blockYoutubeShorts', 'blockYoutubeGames', 'blockInstagramReels', 'blockFacebookReels', 'showExtensionIcon'].includes(storageKey);
       const isEnabled = result[storageKey] !== undefined ? result[storageKey] : defaultTrue;
       const el = document.getElementById(elementId);
       if (el) el.checked = isEnabled;
@@ -184,15 +185,15 @@ function setupEventListeners() {
   const snoozeButtons = document.querySelectorAll('.btn-snooze');
   snoozeButtons.forEach(btn => {
     btn.addEventListener('click', (e) => {
-        const minutes = parseInt(e.target.getAttribute('data-minutes'), 10) || 5;
-        const snoozeUntil = Date.now() + minutes * 60 * 1000;
+      const minutes = parseInt(e.target.getAttribute('data-minutes'), 10) || 5;
+      const snoozeUntil = Date.now() + minutes * 60 * 1000;
 
-        chrome.storage.local.set({ snoozeUntil }, () => {
-          if (chrome.alarms) {
-            chrome.alarms.create('endSnooze', { when: snoozeUntil });
-          }
-          updateUI();
-        });
+      chrome.storage.local.set({ snoozeUntil }, () => {
+        if (chrome.alarms) {
+          chrome.alarms.create('endSnooze', { when: snoozeUntil });
+        }
+        updateUI();
+      });
     });
   });
 
@@ -345,10 +346,20 @@ function applyI18nTranslations() {
   setI18nText('lbl-focus-enable', 'focusEnable');
   setI18nText('lbl-focus-hours', 'focusHoursLabel');
   setI18nText('lbl-focus-until', 'focusUntil');
+  setI18nText('lbl-show-icon', 'showExtensionIcon');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
   updateUI();
   setupEventListeners();
   applyI18nTranslations();
+
+  // Load AdsOnBread
+  const adContainer = document.getElementById('ad-slot');
+  if (adContainer && typeof AdsOnBread !== 'undefined') {
+    AdsOnBread.load('b84f1d67-0435-4fe5-8498-3bb6f7a1ee1f', 'banner', adContainer, {
+      theme: 'dark', // can use 'dark' too
+      language: chrome.i18n.getUILanguage()
+    });
+  }
 });

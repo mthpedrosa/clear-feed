@@ -34,9 +34,14 @@ const SELECTORS = {
   instagram: {
     reels: [
       'a[href^="/reels/"]', 
-      'a[href*="/reel/"]', 
-      'svg[aria-label*="Reels"]',
-      'div[aria-label="Reels"]'
+      'a[href*="/reel/"]',
+      'a:has(svg[aria-label*="Reel" i])',
+      'a:has(svg[aria-label*="reel" i])',
+      'a:has(svg[aria-label*="Vídeo" i])',
+      'a:has(svg[aria-label*="Video" i])',
+      'a:has(svg[aria-label*="Clip" i])',
+      'svg[aria-label*="Reels" i]',
+      'div[aria-label="Reels" i]'
     ]
   },
   facebook: {
@@ -66,7 +71,8 @@ let currentConfig = {
   focusStartTime: "09:00",
   focusEndTime: "17:00",
   focusDays: [1, 2, 3, 4, 5],
-  isPaidUser: false
+  isPaidUser: false,
+  showExtensionIcon: true
 };
 
 const getPlatform = () => {
@@ -225,7 +231,8 @@ const loadConfig = () => {
     'focusStartTime',
     'focusEndTime',
     'focusDays',
-    'isPaidUser'
+    'isPaidUser',
+    'showExtensionIcon'
   ], (result) => {
     currentConfig = {
       blockYoutubeShorts: result.blockYoutubeShorts !== false,
@@ -241,7 +248,8 @@ const loadConfig = () => {
       focusStartTime: result.focusStartTime || "09:00",
       focusEndTime: result.focusEndTime || "17:00",
       focusDays: result.focusDays || [1, 2, 3, 4, 5],
-      isPaidUser: result.isPaidUser === true
+      isPaidUser: result.isPaidUser === true,
+      showExtensionIcon: result.showExtensionIcon !== false
     };
     injectStyles();
     processBlocks();
@@ -264,14 +272,199 @@ chrome.storage.onChanged.addListener((changes) => {
   if (changes.focusEndTime !== undefined) { currentConfig.focusEndTime = changes.focusEndTime.newValue; changed = true; }
   if (changes.focusDays !== undefined) { currentConfig.focusDays = changes.focusDays.newValue; changed = true; }
   if (changes.isPaidUser !== undefined) { currentConfig.isPaidUser = changes.isPaidUser.newValue; changed = true; }
+  if (changes.showExtensionIcon !== undefined) { currentConfig.showExtensionIcon = changes.showExtensionIcon.newValue; changed = true; }
   
   if (changed) {
     injectStyles();
     processBlocks();
+    if (getPlatform() === 'youtube') {
+      injectYoutubeSidebarButton();
+    }
   }
 });
 
 loadConfig();
+
+const injectYoutubeSidebarButton = () => {
+  const existingBtn = document.getElementById('noreels-sidebar-button');
+  
+  if (!currentConfig.showExtensionIcon) {
+    if (existingBtn) existingBtn.remove();
+    return;
+  }
+  
+  if (existingBtn) return;
+
+  // Busca o item do Shorts no menu lateral para colocar logo depois dele
+  const shortsLink = document.querySelector('a[title="Shorts"], a[href^="/shorts/"]');
+  if (!shortsLink) return;
+  
+  const shortsItem = shortsLink.closest('ytd-guide-entry-renderer') || shortsLink.closest('ytd-mini-guide-entry-renderer');
+  if (!shortsItem || !shortsItem.parentElement) return;
+
+  const parentList = shortsItem.parentElement;
+
+  const isMini = shortsItem.tagName.toLowerCase() === 'ytd-mini-guide-entry-renderer';
+
+  // Create Button
+  const btnContainer = document.createElement('div');
+  btnContainer.id = 'noreels-sidebar-button';
+  
+  if (isMini) {
+    btnContainer.style.cssText = 'display: flex; flex-direction: column; justify-content: center; align-items: center; height: 74px; cursor: pointer; border-radius: 10px; margin: 0 4px;';
+  } else {
+    btnContainer.style.cssText = 'display: flex; align-items: center; padding: 0 12px; height: 40px; cursor: pointer; border-radius: 10px; margin: 4px 12px;';
+  }
+  
+  btnContainer.addEventListener('mouseover', () => {
+    btnContainer.style.backgroundColor = document.documentElement.hasAttribute('dark') ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)';
+  });
+  btnContainer.addEventListener('mouseout', () => {
+    btnContainer.style.backgroundColor = 'transparent';
+  });
+  
+  const icon = document.createElement('img');
+  icon.src = chrome.runtime.getURL('images/icon.png');
+  const isDark = document.documentElement.hasAttribute('dark');
+  icon.style.cssText = `width: 24px; height: 24px; border-radius: 50%; box-sizing: border-box; ${isDark ? 'background-color: #ffffff; padding: 2px;' : ''} ${isMini ? 'margin: 0;' : 'margin-right: 24px;'}`;
+  
+  btnContainer.appendChild(icon);
+
+  if (!isMini) {
+    const label = document.createElement('span');
+    label.textContent = 'NoReels';
+    label.style.cssText = 'font-size: 1.4rem; line-height: 2rem; font-weight: 400; font-family: "Roboto","Arial",sans-serif; color: var(--yt-spec-text-primary, #0f0f0f);';
+    btnContainer.appendChild(label);
+  }
+
+  // Create Dropdown Modal (Fixed to screen to avoid sidebar overflow)
+  const dropdown = document.createElement('div');
+  dropdown.id = 'noreels-sidebar-dropdown';
+  dropdown.style.cssText = `
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 80px;
+    transform: translateY(-50%);
+    width: 300px;
+    background: var(--yt-spec-base-background, #ffffff);
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    border: 1px solid var(--yt-spec-10-percent-layer, #e5e5e5);
+    z-index: 9999;
+    padding: 16px;
+    font-family: 'Roboto', 'Arial', sans-serif;
+    color: var(--yt-spec-text-primary, #0f0f0f);
+    cursor: default;
+  `;
+
+  // Dropdown Title
+  const title = document.createElement('h3');
+  title.textContent = 'NoReels Config';
+  title.style.cssText = 'margin: 0 0 12px 0; font-size: 16px; font-weight: 500; border-bottom: 1px solid var(--yt-spec-10-percent-layer, #e5e5e5); padding-bottom: 8px;';
+  dropdown.appendChild(title);
+
+  // Toggles
+  const toggles = [
+    { id: 'yt-shorts', key: 'blockYoutubeShorts', label: 'Block Shorts' },
+    { id: 'yt-games', key: 'blockYoutubeGames', label: 'Block Games' },
+    { id: 'yt-comments', key: 'blockYoutubeComments', label: 'Hide Comments' },
+    { id: 'yt-home', key: 'blockYoutubeHome', label: 'Home Recommendations' },
+    { id: 'yt-video-rec', key: 'blockYoutubeVideoRec', label: 'Video Recommendations' }
+  ];
+
+  toggles.forEach(t => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 14px;';
+    
+    const label = document.createElement('span');
+    label.textContent = chrome.i18n ? chrome.i18n.getMessage(t.key === 'blockYoutubeShorts' ? 'blockShorts' : 
+                                                            t.key === 'blockYoutubeGames' ? 'blockGames' :
+                                                            t.key === 'blockYoutubeComments' ? 'hideComments' :
+                                                            t.key === 'blockYoutubeHome' ? 'homeRecs' : 'videoRecs') || t.label : t.label;
+
+    const toggleWrap = document.createElement('label');
+    toggleWrap.style.cssText = 'position: relative; display: inline-block; width: 34px; height: 20px; cursor: pointer;';
+
+    const input = document.createElement('input');
+    input.type = 'checkbox';
+    input.style.cssText = 'opacity: 0; width: 0; height: 0; position: absolute;';
+    input.checked = currentConfig[t.key];
+    
+    const slider = document.createElement('span');
+    slider.style.cssText = `
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background-color: ${input.checked ? '#065fd4' : '#ccc'};
+      transition: .4s; border-radius: 20px;
+    `;
+    
+    const circle = document.createElement('span');
+    circle.style.cssText = `
+      position: absolute; height: 16px; width: 16px; left: 2px; bottom: 2px;
+      background-color: white; transition: .4s; border-radius: 50%;
+      transform: ${input.checked ? 'translateX(14px)' : 'translateX(0)'};
+    `;
+
+    input.addEventListener('change', (e) => {
+      slider.style.backgroundColor = e.target.checked ? '#065fd4' : '#ccc';
+      circle.style.transform = e.target.checked ? 'translateX(14px)' : 'translateX(0)';
+      chrome.storage.local.set({ [t.key]: e.target.checked });
+    });
+
+    slider.appendChild(circle);
+    toggleWrap.appendChild(input);
+    toggleWrap.appendChild(slider);
+    
+    row.appendChild(label);
+    row.appendChild(toggleWrap);
+    dropdown.appendChild(row);
+  });
+
+  // AdsOnBread Container
+  const adContainer = document.createElement('div');
+  adContainer.id = 'noreels-youtube-ad';
+  adContainer.style.cssText = 'margin-top: 16px; display: flex; justify-content: center; border-top: 1px solid var(--yt-spec-10-percent-layer, #e5e5e5); padding-top: 16px;';
+  dropdown.appendChild(adContainer);
+
+  document.body.appendChild(dropdown);
+
+  // Toggle Dropdown Event
+  btnContainer.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isVisible = dropdown.style.display === 'block';
+    
+    if (isVisible) {
+      dropdown.style.display = 'none';
+    } else {
+      // Ajusta posição
+      const rect = btnContainer.getBoundingClientRect();
+      dropdown.style.left = `${rect.right + 10}px`;
+      dropdown.style.top = `${rect.top}px`;
+      dropdown.style.transform = 'none';
+      
+      dropdown.style.display = 'block';
+      
+      if (typeof AdsOnBread !== 'undefined') {
+        try {
+          AdsOnBread.load('b84f1d67-0435-4fe5-8498-3bb6f7a1ee1f', 'banner', document.getElementById('noreels-youtube-ad'), {
+            theme: document.documentElement.hasAttribute('dark') ? 'dark' : 'light'
+          });
+        } catch (err) {
+          console.error('AdsOnBread load error:', err);
+        }
+      }
+    }
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!btnContainer.contains(e.target) && !dropdown.contains(e.target)) {
+      dropdown.style.display = 'none';
+    }
+  });
+
+  parentList.insertBefore(btnContainer, shortsItem.nextSibling);
+};
 
 const observer = new MutationObserver(() => {
   const platform = getPlatform();
@@ -280,6 +473,10 @@ const observer = new MutationObserver(() => {
       injectStyles();
     }
     processBlocks();
+    
+    if (platform === 'youtube') {
+      injectYoutubeSidebarButton();
+    }
   }
 });
 
