@@ -17,15 +17,6 @@
     "btnNo": {
         "message": "No, thanks"
     },
-    "tierFree": {
-        "message": "FREE"
-    },
-    "tierPro": {
-        "message": "PRO"
-    },
-    "toggleDevPro": {
-        "message": "Simulate PRO"
-    },
     "snoozeTitle": {
         "message": "Temporary Pause"
     },
@@ -73,12 +64,6 @@
     },
     "statsModalTitle": {
         "message": "Analytics Dashboard"
-    },
-    "upgradeBanner": {
-        "message": "Unlock Temporary Pause, Focus Schedule & Advanced Analytics!"
-    },
-    "upgradeBtn": {
-        "message": "Upgrade to PRO"
     },
     "navStats": {
         "message": "Analytics"
