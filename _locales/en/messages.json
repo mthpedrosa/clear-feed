@@ -81,19 +81,22 @@
         "message": "Block Shorts"
     },
     "hideComments": {
-        "message": "Hide Comments"
+        "message": "Block Comments"
     },
     "homeRecs": {
-        "message": "Home Recommendations"
+        "message": "Block Home Recs"
     },
     "videoRecs": {
-        "message": "Video Recommendations"
+        "message": "Block Video Recs"
     },
     "blockReels": {
         "message": "Block Reels"
     },
     "blockStories": {
         "message": "Block Stories"
+    },
+    "blockGames": {
+        "message": "Block Games"
     },
     "lockTitle": {
         "message": "Exclusive PRO Feature"
@@ -136,5 +139,8 @@
     },
     "showExtensionIcon": {
         "message": "Show extension icon on sites"
+    },
+    "removeMenuWarning": {
+        "message": "You can hide this menu in the extension settings."
     }
 }

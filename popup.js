@@ -9,6 +9,7 @@ const CONFIG_KEYS = {
   'ig-reels': 'blockInstagramReels',
   'fb-reels': 'blockFacebookReels',
   'fb-stories': 'blockFacebookStories',
+  'fb-games': 'blockFacebookGames',
   'show-extension-icon': 'showExtensionIcon'
 };
 
@@ -76,7 +77,7 @@ function updateUI() {
   chrome.storage.local.get(storageKeys, (result) => {
     // 3. Load Standard Toggles
     Object.entries(CONFIG_KEYS).forEach(([elementId, storageKey]) => {
-      const defaultTrue = ['blockYoutubeShorts', 'blockYoutubeGames', 'blockInstagramReels', 'blockFacebookReels', 'showExtensionIcon'].includes(storageKey);
+      const defaultTrue = ['blockYoutubeShorts', 'blockYoutubeGames', 'blockInstagramReels', 'blockFacebookReels', 'blockFacebookGames', 'showExtensionIcon'].includes(storageKey);
       const isEnabled = result[storageKey] !== undefined ? result[storageKey] : defaultTrue;
       const el = document.getElementById(elementId);
       if (el) el.checked = isEnabled;

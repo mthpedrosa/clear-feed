@@ -81,19 +81,22 @@
         "message": "Bloquear Shorts"
     },
     "hideComments": {
-        "message": "Ocultar Comentários"
+        "message": "Bloquear Comentários"
     },
     "homeRecs": {
-        "message": "Recomendações Iniciais"
+        "message": "Bloquear Recomendações Iniciais"
     },
     "videoRecs": {
-        "message": "Recomendações de Vídeo"
+        "message": "Bloquear Recomendações de Vídeo"
     },
     "blockReels": {
         "message": "Bloquear Reels"
     },
     "blockStories": {
         "message": "Bloquear Stories"
+    },
+    "blockGames": {
+        "message": "Bloquear Jogos"
     },
     "lockTitle": {
         "message": "Recurso Exclusivo"
@@ -136,5 +139,8 @@
     },
     "showExtensionIcon": {
         "message": "Mostrar ícone da extensão nos sites"
+    },
+    "removeMenuWarning": {
+        "message": "Você pode ocultar este menu nas configurações da extensão."
     }
 }

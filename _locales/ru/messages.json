@@ -81,19 +81,22 @@
         "message": "Блокировать Shorts"
     },
     "hideComments": {
-        "message": "Скрыть комментарии"
+        "message": "Блокировать Комментарии"
     },
     "homeRecs": {
-        "message": "Рекомендации на главной"
+        "message": "Блокировать Рекомендации на Главной"
     },
     "videoRecs": {
-        "message": "Рекомендации к видео"
+        "message": "Блокировать Рекомендации Видео"
     },
     "blockReels": {
         "message": "Блокировать Reels"
     },
     "blockStories": {
         "message": "Блокировать Истории"
+    },
+    "blockGames": {
+        "message": "Блокировать Игры"
     },
     "lockTitle": {
         "message": "Эксклюзивная функция PRO"
@@ -136,5 +139,8 @@
     },
     "showExtensionIcon": {
         "message": "Показывать значок расширения на сайтах"
+    },
+    "removeMenuWarning": {
+        "message": "Вы можете скрыть это меню в настройках расширения."
     }
 }
