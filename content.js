@@ -561,7 +561,7 @@ const injectFacebookSidebarButton = () => {
   const icon = document.createElement('img');
   icon.src = chrome.runtime.getURL('images/icon.png');
   const isDark = currentConfig.isDarkMode || document.documentElement.classList.contains('__fb-dark-mode');
-  icon.style.cssText = `width: 36px; height: 36px; border-radius: 50%; box-sizing: border-box; ${isDark ? 'background-color: #ffffff; padding: 2px;' : ''} margin-right: 12px;`;
+  icon.style.cssText = `width: 24px; height: 24px; border-radius: 50%; box-sizing: border-box; ${isDark ? 'background-color: #ffffff; padding: 2px;' : ''} margin-right: 12px;`;
   
   btnContainer.appendChild(icon);
 
