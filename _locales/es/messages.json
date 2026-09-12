@@ -17,15 +17,6 @@
     "btnNo": {
         "message": "No, gracias"
     },
-    "tierFree": {
-        "message": "GRATIS"
-    },
-    "tierPro": {
-        "message": "PRO"
-    },
-    "toggleDevPro": {
-        "message": "Simular PRO"
-    },
     "snoozeTitle": {
         "message": "Pausa Temporal"
     },
@@ -73,12 +64,6 @@
     },
     "statsModalTitle": {
         "message": "Panel de Estadísticas"
-    },
-    "upgradeBanner": {
-        "message": "¡Desbloquea Pausa Temporal, Modo Enfoque y Estadísticas Avanzadas!"
-    },
-    "upgradeBtn": {
-        "message": "Obtener PRO"
     },
     "navStats": {
         "message": "Análisis"

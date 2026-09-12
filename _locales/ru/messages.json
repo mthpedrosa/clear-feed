@@ -17,15 +17,6 @@
     "btnNo": {
         "message": "Нет, спасибо"
     },
-    "tierFree": {
-        "message": "БЕСПЛАТНО"
-    },
-    "tierPro": {
-        "message": "PRO"
-    },
-    "toggleDevPro": {
-        "message": "Симулировать PRO"
-    },
     "snoozeTitle": {
         "message": "Временная пауза"
     },
@@ -73,12 +64,6 @@
     },
     "statsModalTitle": {
         "message": "Панель статистики"
-    },
-    "upgradeBanner": {
-        "message": "Разблокируйте паузу, расписание фокуса и статистику!"
-    },
-    "upgradeBtn": {
-        "message": "Перейти на PRO"
     },
     "navStats": {
         "message": "Анализ"

@@ -72,7 +72,8 @@ let currentConfig = {
   focusEndTime: "17:00",
   focusDays: [1, 2, 3, 4, 5],
   isPaidUser: false,
-  showExtensionIcon: true
+  showExtensionIcon: true,
+  isDarkMode: false
 };
 
 const getPlatform = () => {
@@ -232,7 +233,8 @@ const loadConfig = () => {
     'focusEndTime',
     'focusDays',
     'isPaidUser',
-    'showExtensionIcon'
+    'showExtensionIcon',
+    'isDarkMode'
   ], (result) => {
     currentConfig = {
       blockYoutubeShorts: result.blockYoutubeShorts !== false,
@@ -249,7 +251,8 @@ const loadConfig = () => {
       focusEndTime: result.focusEndTime || "17:00",
       focusDays: result.focusDays || [1, 2, 3, 4, 5],
       isPaidUser: result.isPaidUser === true,
-      showExtensionIcon: result.showExtensionIcon !== false
+      showExtensionIcon: result.showExtensionIcon !== false,
+      isDarkMode: result.isDarkMode === true
     };
     injectStyles();
     processBlocks();
@@ -273,6 +276,40 @@ chrome.storage.onChanged.addListener((changes) => {
   if (changes.focusDays !== undefined) { currentConfig.focusDays = changes.focusDays.newValue; changed = true; }
   if (changes.isPaidUser !== undefined) { currentConfig.isPaidUser = changes.isPaidUser.newValue; changed = true; }
   if (changes.showExtensionIcon !== undefined) { currentConfig.showExtensionIcon = changes.showExtensionIcon.newValue; changed = true; }
+  if (changes.isDarkMode !== undefined) { 
+    currentConfig.isDarkMode = changes.isDarkMode.newValue; 
+    changed = true; 
+    
+    // Dynamically update dropdown colors if it exists
+    const dropdown = document.getElementById('noreels-sidebar-dropdown');
+    if (dropdown) {
+      if (currentConfig.isDarkMode) {
+        dropdown.style.background = '#1a1a1a';
+        dropdown.style.color = '#FFFFFF';
+        dropdown.style.borderColor = '#444444';
+        const title = dropdown.querySelector('h3');
+        if (title) {
+          title.style.borderColor = '#444444';
+          title.style.color = '#FFFFFF';
+        }
+        dropdown.querySelectorAll('span').forEach(span => {
+          if (!span.style.backgroundColor && !span.style.borderRadius) span.style.color = '#FFFFFF';
+        });
+      } else {
+        dropdown.style.background = 'var(--yt-spec-base-background, #ffffff)';
+        dropdown.style.color = 'var(--yt-spec-text-primary, #0f0f0f)';
+        dropdown.style.borderColor = 'var(--yt-spec-10-percent-layer, #e5e5e5)';
+        const title = dropdown.querySelector('h3');
+        if (title) {
+          title.style.borderColor = 'var(--yt-spec-10-percent-layer, #e5e5e5)';
+          title.style.color = 'var(--yt-spec-text-primary, #0f0f0f)';
+        }
+        dropdown.querySelectorAll('span').forEach(span => {
+          if (!span.style.backgroundColor && !span.style.borderRadius) span.style.color = 'var(--yt-spec-text-primary, #0f0f0f)';
+        });
+      }
+    }
+  }
   
   if (changed) {
     injectStyles();
@@ -340,6 +377,11 @@ const injectYoutubeSidebarButton = () => {
   // Create Dropdown Modal (Fixed to screen to avoid sidebar overflow)
   const dropdown = document.createElement('div');
   dropdown.id = 'noreels-sidebar-dropdown';
+  
+  const bg = currentConfig.isDarkMode ? '#1a1a1a' : 'var(--yt-spec-base-background, #ffffff)';
+  const border = currentConfig.isDarkMode ? '#444444' : 'var(--yt-spec-10-percent-layer, #e5e5e5)';
+  const textClr = currentConfig.isDarkMode ? '#FFFFFF' : 'var(--yt-spec-text-primary, #0f0f0f)';
+  
   dropdown.style.cssText = `
     display: none;
     position: fixed;
@@ -347,21 +389,21 @@ const injectYoutubeSidebarButton = () => {
     left: 80px;
     transform: translateY(-50%);
     width: 300px;
-    background: var(--yt-spec-base-background, #ffffff);
+    background: ${bg};
     border-radius: 12px;
     box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-    border: 1px solid var(--yt-spec-10-percent-layer, #e5e5e5);
+    border: 1px solid ${border};
     z-index: 9999;
     padding: 16px;
     font-family: 'Roboto', 'Arial', sans-serif;
-    color: var(--yt-spec-text-primary, #0f0f0f);
+    color: ${textClr};
     cursor: default;
   `;
 
   // Dropdown Title
   const title = document.createElement('h3');
   title.textContent = 'NoReels Config';
-  title.style.cssText = 'margin: 0 0 12px 0; font-size: 16px; font-weight: 500; border-bottom: 1px solid var(--yt-spec-10-percent-layer, #e5e5e5); padding-bottom: 8px;';
+  title.style.cssText = `margin: 0 0 12px 0; font-size: 16px; font-weight: 500; border-bottom: 1px solid ${border}; padding-bottom: 8px; color: ${textClr};`;
   dropdown.appendChild(title);
 
   // Toggles
