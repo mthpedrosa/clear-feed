@@ -134,9 +134,6 @@
     "devBy": {
         "message": "Developed by Matheus Pedrosa"
     },
-    "blockGames": {
-        "message": "Hide Games"
-    },
     "showExtensionIcon": {
         "message": "Show extension icon on sites"
     },

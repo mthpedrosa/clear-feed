@@ -361,6 +361,23 @@ function applyI18nTranslations() {
   setI18nText('lbl-ig-reels', 'blockReels');
   setI18nText('lbl-fb-reels', 'blockReels');
   setI18nText('lbl-fb-stories', 'blockStories');
+  setI18nText('lbl-fb-games', 'blockGames');
+
+  // Snooze buttons
+  const snoozeMap = {
+    '5': 'snooze5m',
+    '15': 'snooze15m',
+    '30': 'snooze30m',
+    '60': 'snooze1h'
+  };
+  document.querySelectorAll('.btn-snooze').forEach(btn => {
+    const mins = btn.getAttribute('data-minutes');
+    const key = snoozeMap[mins];
+    if (key) {
+      const msg = chrome.i18n.getMessage(key);
+      if (msg) btn.textContent = msg;
+    }
+  });
 
   // Back buttons
   const backLabels = document.querySelectorAll('.lbl-btn-back');
@@ -397,9 +414,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // Load AdsOnBread
   const adContainer = document.getElementById('ad-slot');
   if (adContainer && typeof AdsOnBread !== 'undefined') {
-    AdsOnBread.load('b84f1d67-0435-4fe5-8498-3bb6f7a1ee1f', 'banner', adContainer, {
-      theme: 'dark', // can use 'dark' too
-      language: chrome.i18n.getUILanguage()
+    chrome.storage.local.get(['isDarkMode'], (res) => {
+      AdsOnBread.load('b84f1d67-0435-4fe5-8498-3bb6f7a1ee1f', 'banner', adContainer, {
+        theme: res.isDarkMode ? 'dark' : 'light',
+        language: chrome.i18n.getUILanguage()
+      });
     });
   }
 });
