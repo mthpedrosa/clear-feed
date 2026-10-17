@@ -94,12 +94,11 @@ const getPlatform = () => {
 };
 
 const isSnoozed = () => {
-  if (!currentConfig.isPaidUser) return false;
-  return currentConfig.snoozeUntil && Date.now() < currentConfig.snoozeUntil;
+  return Boolean(currentConfig.snoozeUntil && Date.now() < currentConfig.snoozeUntil);
 };
 
 const isWithinFocusSchedule = () => {
-  if (!currentConfig.isPaidUser || !currentConfig.focusScheduleEnabled) return true;
+  if (!currentConfig.focusScheduleEnabled) return true;
 
   const now = new Date();
   const currentDay = now.getDay();
@@ -126,14 +125,44 @@ const isWithinFocusSchedule = () => {
   }
 };
 
+const isBlockingActive = () => {
+  return !isSnoozed() && isWithinFocusSchedule();
+};
+
+const handleDirectUrlRedirects = () => {
+  const platform = getPlatform();
+  if (!platform || !isBlockingActive()) return;
+
+  const path = window.location.pathname;
+
+  if (platform === 'youtube' && currentConfig.blockYoutubeShorts) {
+    if (path.startsWith('/shorts')) {
+      const segments = path.split('/').filter(Boolean);
+      const videoId = segments[1];
+      const targetUrl = videoId
+        ? `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}`
+        : 'https://www.youtube.com/';
+      window.location.replace(targetUrl);
+    }
+  } else if (platform === 'instagram' && currentConfig.blockInstagramReels) {
+    if (path.startsWith('/reels') || path.startsWith('/reel/')) {
+      window.location.replace('https://www.instagram.com/');
+    }
+  } else if (platform === 'facebook' && currentConfig.blockFacebookReels) {
+    if (path.startsWith('/reel') || path.startsWith('/reels')) {
+      window.location.replace('https://www.facebook.com/');
+    }
+  }
+};
+
 const injectStyles = () => {
   const platform = getPlatform();
   if (!platform) return;
 
   const existing = document.getElementById('noreels-fix-styles');
-  if (existing) existing.remove();
 
-  if (isSnoozed() || !isWithinFocusSchedule()) {
+  if (!isBlockingActive()) {
+    if (existing) existing.remove();
     return;
   }
 
@@ -169,37 +198,71 @@ const injectStyles = () => {
     if (currentConfig.blockFacebookGames) activeSelectors.push(...SELECTORS.facebook.games);
   }
 
-  const style = document.createElement('style');
-  style.id = 'noreels-fix-styles';
-  style.innerHTML = `
+  const newStyleContent = `
     ${activeSelectors.length > 0 ? activeSelectors.join(',\n') + ' { display: none !important; }' : ''}
     ${customCSS}
   `;
+
+  if (existing) {
+    if (existing.innerHTML !== newStyleContent) {
+      existing.innerHTML = newStyleContent;
+    }
+    return;
+  }
+
+  const style = document.createElement('style');
+  style.id = 'noreels-fix-styles';
+  style.innerHTML = newStyleContent;
   (document.head || document.documentElement).appendChild(style);
 };
 
-const updateMetrics = (platform, blockedCount) => {
+let pendingMetrics = { youtube: 0, instagram: 0, facebook: 0 };
+let isFlushingMetrics = false;
+
+const flushMetrics = () => {
+  if (isFlushingMetrics) return;
+  const toFlush = { ...pendingMetrics };
+  const totalNew = toFlush.youtube + toFlush.instagram + toFlush.facebook;
+  if (totalNew === 0) return;
+
+  pendingMetrics = { youtube: 0, instagram: 0, facebook: 0 };
+  isFlushingMetrics = true;
+
   chrome.storage.local.get(['totalBlocked', 'statsByPlatform', 'statsHistory'], (result) => {
-    const totalBlocked = (result.totalBlocked || 0) + blockedCount;
+    const totalBlocked = (result.totalBlocked || 0) + totalNew;
 
     const statsByPlatform = result.statsByPlatform || { youtube: 0, instagram: 0, facebook: 0 };
-    statsByPlatform[platform] = (statsByPlatform[platform] || 0) + blockedCount;
-
     const todayStr = new Date().toISOString().split('T')[0];
     const statsHistory = result.statsHistory || {};
     if (!statsHistory[todayStr]) {
       statsHistory[todayStr] = { youtube: 0, instagram: 0, facebook: 0 };
     }
-    statsHistory[todayStr][platform] = (statsHistory[todayStr][platform] || 0) + blockedCount;
 
-    chrome.storage.local.set({ totalBlocked, statsByPlatform, statsHistory });
+    ['youtube', 'instagram', 'facebook'].forEach((plat) => {
+      if (toFlush[plat] > 0) {
+        statsByPlatform[plat] = (statsByPlatform[plat] || 0) + toFlush[plat];
+        statsHistory[todayStr][plat] = (statsHistory[todayStr][plat] || 0) + toFlush[plat];
+      }
+    });
+
+    chrome.storage.local.set({ totalBlocked, statsByPlatform, statsHistory }, () => {
+      isFlushingMetrics = false;
+      if (pendingMetrics.youtube + pendingMetrics.instagram + pendingMetrics.facebook > 0) {
+        flushMetrics();
+      }
+    });
   });
+};
+
+const updateMetrics = (platform, blockedCount) => {
+  if (!platform || blockedCount <= 0) return;
+  pendingMetrics[platform] = (pendingMetrics[platform] || 0) + blockedCount;
+  flushMetrics();
 };
 
 const processBlocks = () => {
   const platform = getPlatform();
-  if (!platform) return;
-  if (isSnoozed() || !isWithinFocusSchedule()) return;
+  if (!platform || !isBlockingActive()) return;
 
   let newlyBlocked = 0;
   const selectorsToCount = [];
@@ -225,6 +288,17 @@ const processBlocks = () => {
 
   if (newlyBlocked > 0) {
     updateMetrics(platform, newlyBlocked);
+  }
+};
+
+const injectPlatformSidebarButton = () => {
+  const platform = getPlatform();
+  if (platform === 'youtube') {
+    injectYoutubeSidebarButton();
+  } else if (platform === 'facebook') {
+    injectFacebookSidebarButton();
+  } else if (platform === 'instagram') {
+    injectInstagramSidebarButton();
   }
 };
 
@@ -267,8 +341,33 @@ const loadConfig = () => {
       showExtensionIcon: result.showExtensionIcon !== false,
       isDarkMode: result.isDarkMode === true
     };
+    handleDirectUrlRedirects();
     injectStyles();
     processBlocks();
+    injectPlatformSidebarButton();
+  });
+};
+
+const applyDropdownTheme = (dropdownId, defaultLightBg, defaultLightText, defaultLightBorder) => {
+  const dropdown = document.getElementById(dropdownId);
+  if (!dropdown) return;
+  const isDark = currentConfig.isDarkMode;
+  const bg = isDark ? '#1a1a1a' : defaultLightBg;
+  const text = isDark ? '#FFFFFF' : defaultLightText;
+  const border = isDark ? '#444444' : defaultLightBorder;
+
+  dropdown.style.background = bg;
+  dropdown.style.color = text;
+  dropdown.style.borderColor = border;
+  const title = dropdown.querySelector('h3');
+  if (title) {
+    title.style.borderColor = border;
+    title.style.color = text;
+  }
+  dropdown.querySelectorAll('span').forEach(span => {
+    if (!span.style.backgroundColor && !span.style.borderRadius) {
+      span.style.color = text;
+    }
   });
 };
 
@@ -294,45 +393,21 @@ chrome.storage.onChanged.addListener((changes) => {
     currentConfig.isDarkMode = changes.isDarkMode.newValue; 
     changed = true; 
     
-    // Dynamically update dropdown colors if it exists
-    const dropdown = document.getElementById('noreels-sidebar-dropdown');
-    if (dropdown) {
-      if (currentConfig.isDarkMode) {
-        dropdown.style.background = '#1a1a1a';
-        dropdown.style.color = '#FFFFFF';
-        dropdown.style.borderColor = '#444444';
-        const title = dropdown.querySelector('h3');
-        if (title) {
-          title.style.borderColor = '#444444';
-          title.style.color = '#FFFFFF';
-        }
-        dropdown.querySelectorAll('span').forEach(span => {
-          if (!span.style.backgroundColor && !span.style.borderRadius) span.style.color = '#FFFFFF';
-        });
-      } else {
-        dropdown.style.background = 'var(--yt-spec-base-background, #ffffff)';
-        dropdown.style.color = 'var(--yt-spec-text-primary, #0f0f0f)';
-        dropdown.style.borderColor = 'var(--yt-spec-10-percent-layer, #e5e5e5)';
-        const title = dropdown.querySelector('h3');
-        if (title) {
-          title.style.borderColor = 'var(--yt-spec-10-percent-layer, #e5e5e5)';
-          title.style.color = 'var(--yt-spec-text-primary, #0f0f0f)';
-        }
-        dropdown.querySelectorAll('span').forEach(span => {
-          if (!span.style.backgroundColor && !span.style.borderRadius) span.style.color = 'var(--yt-spec-text-primary, #0f0f0f)';
-        });
-      }
-    }
+    applyDropdownTheme(
+      'noreels-sidebar-dropdown',
+      'var(--yt-spec-base-background, #ffffff)',
+      'var(--yt-spec-text-primary, #0f0f0f)',
+      'var(--yt-spec-10-percent-layer, #e5e5e5)'
+    );
+    applyDropdownTheme('noreels-fb-dropdown', '#ffffff', '#050505', '#ced0d4');
+    applyDropdownTheme('noreels-ig-dropdown', '#ffffff', '#000000', '#dbdbdb');
   }
   
   if (changed) {
+    handleDirectUrlRedirects();
     injectStyles();
     processBlocks();
-    if (getPlatform() === 'youtube') {
-      injectYoutubeSidebarButton();
-    } else if (getPlatform() === 'facebook') {
-      injectFacebookSidebarButton();
-    }
+    injectPlatformSidebarButton();
   }
 });
 
@@ -340,9 +415,11 @@ loadConfig();
 
 const injectYoutubeSidebarButton = () => {
   const existingBtn = document.getElementById('noreels-sidebar-button');
+  const existingDropdown = document.getElementById('noreels-sidebar-dropdown');
   
   if (!currentConfig.showExtensionIcon) {
     if (existingBtn) existingBtn.remove();
+    if (existingDropdown) existingDropdown.remove();
     return;
   }
   
@@ -389,6 +466,8 @@ const injectYoutubeSidebarButton = () => {
     label.style.cssText = 'font-size: 1.4rem; line-height: 2rem; font-weight: 400; font-family: "Roboto","Arial",sans-serif; color: var(--yt-spec-text-primary, #0f0f0f);';
     btnContainer.appendChild(label);
   }
+
+  if (existingDropdown) existingDropdown.remove();
 
   // Create Dropdown Modal (Fixed to screen to avoid sidebar overflow)
   const dropdown = document.createElement('div');
@@ -531,9 +610,11 @@ const injectYoutubeSidebarButton = () => {
 
 const injectFacebookSidebarButton = () => {
   const existingBtn = document.getElementById('noreels-fb-sidebar-button');
+  const existingDropdown = document.getElementById('noreels-fb-dropdown');
   
   if (!currentConfig.showExtensionIcon) {
     if (existingBtn) existingBtn.remove();
+    if (existingDropdown) existingDropdown.remove();
     return;
   }
   
@@ -569,6 +650,8 @@ const injectFacebookSidebarButton = () => {
   label.textContent = 'NoReels';
   label.style.cssText = 'font-size: 15px; font-weight: 500; font-family: Segoe UI, Helvetica, Arial, sans-serif; color: ' + (isDark ? '#E4E6EB' : '#050505') + ';';
   btnContainer.appendChild(label);
+
+  if (existingDropdown) existingDropdown.remove();
 
   const dropdown = document.createElement('div');
   dropdown.id = 'noreels-fb-dropdown';
@@ -703,21 +786,197 @@ const injectFacebookSidebarButton = () => {
   parentList.insertBefore(btnContainer, reelsItem.nextSibling);
 };
 
+const injectInstagramSidebarButton = () => {
+  const existingBtn = document.getElementById('noreels-ig-sidebar-button');
+  const existingDropdown = document.getElementById('noreels-ig-dropdown');
+
+  if (!currentConfig.showExtensionIcon) {
+    if (existingBtn) existingBtn.remove();
+    if (existingDropdown) existingDropdown.remove();
+    return;
+  }
+
+  if (existingBtn) return;
+
+  const reelsLink = document.querySelector('a[href^="/reels/"], a[href*="/reel/"]');
+  if (!reelsLink) return;
+
+  const reelsItem = reelsLink.closest('span') || reelsLink.parentElement;
+  if (!reelsItem || !reelsItem.parentElement) return;
+
+  const parentList = reelsItem.parentElement;
+
+  const btnContainer = document.createElement('div');
+  btnContainer.id = 'noreels-ig-sidebar-button';
+  btnContainer.style.cssText = 'display: flex; align-items: center; padding: 12px; cursor: pointer; border-radius: 8px; margin: 4px 0; transition: background-color 0.2s;';
+
+  const isIgDark = currentConfig.isDarkMode || document.documentElement.classList.contains('_aa4d') || window.getComputedStyle(document.body).backgroundColor === 'rgb(0, 0, 0)';
+
+  btnContainer.addEventListener('mouseover', () => {
+    btnContainer.style.backgroundColor = isIgDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)';
+  });
+  btnContainer.addEventListener('mouseout', () => {
+    btnContainer.style.backgroundColor = 'transparent';
+  });
+
+  const icon = document.createElement('img');
+  icon.src = chrome.runtime.getURL('images/icon.png');
+  icon.style.cssText = `width: 24px; height: 24px; border-radius: 50%; box-sizing: border-box; ${isIgDark ? 'background-color: #ffffff; padding: 2px;' : ''} margin-right: 16px; flex-shrink: 0;`;
+  btnContainer.appendChild(icon);
+
+  const label = document.createElement('span');
+  label.textContent = 'NoReels';
+  label.style.cssText = `font-size: 16px; font-weight: 400; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: ${isIgDark ? '#F5F5F5' : '#000000'};`;
+  btnContainer.appendChild(label);
+
+  if (existingDropdown) existingDropdown.remove();
+
+  const dropdown = document.createElement('div');
+  dropdown.id = 'noreels-ig-dropdown';
+
+  const bg = currentConfig.isDarkMode ? '#1a1a1a' : '#ffffff';
+  const border = currentConfig.isDarkMode ? '#444444' : '#dbdbdb';
+  const textClr = currentConfig.isDarkMode ? '#FFFFFF' : '#000000';
+
+  dropdown.style.cssText = `
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 80px;
+    transform: translateY(-50%);
+    width: 300px;
+    background: ${bg};
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    border: 1px solid ${border};
+    z-index: 9999;
+    padding: 16px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: ${textClr};
+    cursor: default;
+  `;
+
+  const title = document.createElement('h3');
+  title.textContent = 'NoReels Config';
+  title.style.cssText = `margin: 0 0 12px 0; font-size: 16px; font-weight: 600; border-bottom: 1px solid ${border}; padding-bottom: 8px; color: ${textClr};`;
+  dropdown.appendChild(title);
+
+  const toggles = [
+    { id: 'ig-reels', key: 'blockInstagramReels', label: 'Block Reels' }
+  ];
+
+  toggles.forEach(t => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 14px;';
+
+    const lblSpan = document.createElement('span');
+    lblSpan.textContent = chrome.i18n ? chrome.i18n.getMessage('blockReels') || t.label : t.label;
+
+    const toggleWrap = document.createElement('label');
+    toggleWrap.style.cssText = 'position: relative; display: inline-block; width: 34px; height: 20px; cursor: pointer;';
+
+    const input = document.createElement('input');
+    input.type = 'checkbox';
+    input.style.cssText = 'opacity: 0; width: 0; height: 0; position: absolute;';
+    input.checked = currentConfig[t.key];
+
+    const slider = document.createElement('span');
+    slider.style.cssText = `
+      position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+      background-color: ${input.checked ? '#E1306C' : (currentConfig.isDarkMode ? '#444' : '#ccc')};
+      transition: .4s; border-radius: 20px;
+    `;
+
+    const circle = document.createElement('span');
+    circle.style.cssText = `
+      position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px;
+      background-color: white; transition: .4s; border-radius: 50%;
+      transform: ${input.checked ? 'translateX(14px)' : 'none'};
+    `;
+
+    slider.appendChild(circle);
+    toggleWrap.appendChild(input);
+    toggleWrap.appendChild(slider);
+
+    input.addEventListener('change', (e) => {
+      const isChecked = e.target.checked;
+      slider.style.backgroundColor = isChecked ? '#E1306C' : (currentConfig.isDarkMode ? '#444' : '#ccc');
+      circle.style.transform = isChecked ? 'translateX(14px)' : 'none';
+      chrome.storage.local.set({ [t.key]: isChecked });
+    });
+
+    row.appendChild(lblSpan);
+    row.appendChild(toggleWrap);
+    dropdown.appendChild(row);
+  });
+
+  const warningTextIg = document.createElement('p');
+  warningTextIg.textContent = chrome.i18n ? chrome.i18n.getMessage('removeMenuWarning') || 'You can hide this menu in the extension settings.' : 'You can hide this menu in the extension settings.';
+  warningTextIg.style.cssText = `margin: 10px 0 0 0; font-size: 11px; text-align: center; color: ${currentConfig.isDarkMode ? '#888888' : '#777777'};`;
+  dropdown.appendChild(warningTextIg);
+
+  const adSlot = document.createElement('div');
+  adSlot.id = 'noreels-ig-ad';
+  adSlot.style.cssText = `margin-top: 15px; display: flex; justify-content: center; min-height: 50px; border-top: 1px solid ${border}; padding-top: 15px;`;
+  dropdown.appendChild(adSlot);
+
+  document.body.appendChild(dropdown);
+
+  btnContainer.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isVisible = dropdown.style.display === 'block';
+
+    if (isVisible) {
+      dropdown.style.display = 'none';
+    } else {
+      const rect = btnContainer.getBoundingClientRect();
+      dropdown.style.left = `${rect.right + 10}px`;
+      dropdown.style.top = `${rect.top}px`;
+      dropdown.style.transform = 'none';
+
+      dropdown.style.display = 'block';
+
+      if (typeof AdsOnBread !== 'undefined') {
+        try {
+          AdsOnBread.load('b84f1d67-0435-4fe5-8498-3bb6f7a1ee1f', 'banner', document.getElementById('noreels-ig-ad'), {
+            theme: currentConfig.isDarkMode ? 'dark' : 'light'
+          });
+        } catch (err) {
+          console.error('AdsOnBread load error:', err);
+        }
+      }
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!btnContainer.contains(e.target) && !dropdown.contains(e.target)) {
+      dropdown.style.display = 'none';
+    }
+  });
+
+  parentList.insertBefore(btnContainer, reelsItem.nextSibling);
+};
+
+let observerDebounceTimer = null;
 
 const observer = new MutationObserver(() => {
   const platform = getPlatform();
-  if (platform) {
-    if (!document.getElementById('noreels-fix-styles')) {
-      injectStyles();
-    }
-    processBlocks();
-    
-    if (platform === 'youtube') {
-      injectYoutubeSidebarButton();
-    } else if (platform === 'facebook') {
-      injectFacebookSidebarButton();
-    }
+  if (!platform) return;
+
+  // Keep style injection immediate to prevent visual flicker
+  if (isBlockingActive() && !document.getElementById('noreels-fix-styles')) {
+    injectStyles();
   }
+
+  // Debounce heavy DOM queries and sidebar injection
+  if (observerDebounceTimer) return;
+  observerDebounceTimer = setTimeout(() => {
+    observerDebounceTimer = null;
+    handleDirectUrlRedirects();
+    injectStyles();
+    processBlocks();
+    injectPlatformSidebarButton();
+  }, 200);
 });
 
 observer.observe(document.documentElement, { childList: true, subtree: true });

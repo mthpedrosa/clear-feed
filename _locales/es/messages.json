@@ -134,9 +134,6 @@
     "devBy": {
         "message": "Desarrollado por Matheus Pedrosa"
     },
-    "blockGames": {
-        "message": "Ocultar Juegos"
-    },
     "showExtensionIcon": {
         "message": "Mostrar icono de la extensión en los sitios"
     },

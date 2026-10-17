@@ -134,9 +134,6 @@
     "devBy": {
         "message": "Разработчик: Matheus Pedrosa"
     },
-    "blockGames": {
-        "message": "Скрыть игры"
-    },
     "showExtensionIcon": {
         "message": "Показывать значок расширения на сайтах"
     },
