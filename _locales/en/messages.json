@@ -139,5 +139,20 @@
     },
     "removeMenuWarning": {
         "message": "You can hide this menu in the extension settings."
+    },
+    "blockExplore": {
+        "message": "Block Explore"
+    },
+    "blockShortVideos": {
+        "message": "Block Short Videos"
+    },
+    "blockNews": {
+        "message": "Block News & Trending"
+    },
+    "blockForYou": {
+        "message": "Block 'For You' Tab"
+    },
+    "blockTrends": {
+        "message": "Block Trending"
     }
 }

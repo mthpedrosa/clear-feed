@@ -139,5 +139,20 @@
     },
     "removeMenuWarning": {
         "message": "Вы можете скрыть это меню в настройках расширения."
+    },
+    "blockExplore": {
+        "message": "Блокировать «Интересное»"
+    },
+    "blockShortVideos": {
+        "message": "Блокировать Короткие Видео"
+    },
+    "blockNews": {
+        "message": "Блокировать Новости"
+    },
+    "blockForYou": {
+        "message": "Блокировать Вкладку «Для вас»"
+    },
+    "blockTrends": {
+        "message": "Блокировать Актуальное"
     }
 }

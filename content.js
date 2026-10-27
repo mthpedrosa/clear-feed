@@ -42,6 +42,17 @@ const SELECTORS = {
       'a:has(svg[aria-label*="Clip" i])',
       'svg[aria-label*="Reels" i]',
       'div[aria-label="Reels" i]'
+    ],
+    explore: [
+      'a[href="/explore/"]',
+      'a[href^="/explore/"]',
+      'a:has(svg[aria-label*="Explore" i])',
+      'a:has(svg[aria-label*="Explorar" i])'
+    ],
+    stories: [
+      'div[aria-label="Stories" i]',
+      'a[href^="/stories/"]',
+      'main section div[role="presentation"]:has(ul li button canvas)'
     ]
   },
   facebook: {
@@ -62,6 +73,40 @@ const SELECTORS = {
       'a[aria-label="Gaming" i]',
       'a[aria-label="Jogos" i]'
     ]
+  },
+  linkedin: {
+    videos: [
+      'a[href*="/feed/video"]',
+      'a[href*="/video/"]',
+      'div[data-view-name="feed-short-video-shelf"]',
+      'section:has(a[href*="/video/"])'
+    ],
+    games: [
+      'a[href*="/games/"]',
+      'aside section:has(a[href*="/games/"])',
+      '.feed-shared-update-v2:has(a[href*="/games/"])',
+      '[data-view-name*="game"]'
+    ],
+    news: [
+      '#feed-news-module',
+      '.news-module',
+      'aside section:has(#feed-news-module)',
+      '[data-view-name="news-module"]'
+    ]
+  },
+  x: {
+    forYou: [
+      'div[role="tablist"] > div[role="presentation"]:first-child:has(a[href="/home"][role="tab"])'
+    ],
+    trends: [
+      '[aria-label="Timeline: Trending now"]',
+      '[data-testid="trend"]',
+      '[data-testid="sidebarColumn"] section:has([data-testid="trend"])'
+    ],
+    explore: [
+      'a[data-testid="AppTabBar_Explore_Link"]',
+      'a[href="/explore"]'
+    ]
   }
 };
 
@@ -72,9 +117,17 @@ let currentConfig = {
   blockYoutubeHome: false,
   blockYoutubeVideoRec: false,
   blockInstagramReels: true,
+  blockInstagramExplore: false,
+  blockInstagramStories: false,
   blockFacebookReels: true,
   blockFacebookStories: false,
   blockFacebookGames: true,
+  blockLinkedinVideos: true,
+  blockLinkedinGames: true,
+  blockLinkedinNews: false,
+  blockXForYou: false,
+  blockXTrends: true,
+  blockXExplore: false,
   snoozeUntil: null,
   focusScheduleEnabled: false,
   focusStartTime: "09:00",
@@ -90,6 +143,8 @@ const getPlatform = () => {
   if (host.includes('youtube.com')) return 'youtube';
   if (host.includes('instagram.com')) return 'instagram';
   if (host.includes('facebook.com')) return 'facebook';
+  if (host.includes('linkedin.com')) return 'linkedin';
+  if (host.includes('x.com') || host.includes('twitter.com')) return 'x';
   return null;
 };
 
@@ -144,13 +199,25 @@ const handleDirectUrlRedirects = () => {
         : 'https://www.youtube.com/';
       window.location.replace(targetUrl);
     }
-  } else if (platform === 'instagram' && currentConfig.blockInstagramReels) {
-    if (path.startsWith('/reels') || path.startsWith('/reel/')) {
+  } else if (platform === 'instagram') {
+    if (currentConfig.blockInstagramReels && (path.startsWith('/reels') || path.startsWith('/reel/'))) {
+      window.location.replace('https://www.instagram.com/');
+    } else if (currentConfig.blockInstagramExplore && path.startsWith('/explore')) {
+      window.location.replace('https://www.instagram.com/');
+    } else if (currentConfig.blockInstagramStories && path.startsWith('/stories/')) {
       window.location.replace('https://www.instagram.com/');
     }
   } else if (platform === 'facebook' && currentConfig.blockFacebookReels) {
     if (path.startsWith('/reel') || path.startsWith('/reels')) {
       window.location.replace('https://www.facebook.com/');
+    }
+  } else if (platform === 'linkedin' && currentConfig.blockLinkedinGames) {
+    if (path.startsWith('/games')) {
+      window.location.replace('https://www.linkedin.com/feed/');
+    }
+  } else if (platform === 'x' && currentConfig.blockXExplore) {
+    if (path.startsWith('/explore')) {
+      window.location.replace('https://x.com/home');
     }
   }
 };
@@ -192,10 +259,20 @@ const injectStyles = () => {
     }
   } else if (platform === 'instagram') {
     if (currentConfig.blockInstagramReels) activeSelectors.push(...SELECTORS.instagram.reels);
+    if (currentConfig.blockInstagramExplore) activeSelectors.push(...SELECTORS.instagram.explore);
+    if (currentConfig.blockInstagramStories) activeSelectors.push(...SELECTORS.instagram.stories);
   } else if (platform === 'facebook') {
     if (currentConfig.blockFacebookReels) activeSelectors.push(...SELECTORS.facebook.reels);
     if (currentConfig.blockFacebookStories) activeSelectors.push(...SELECTORS.facebook.stories);
     if (currentConfig.blockFacebookGames) activeSelectors.push(...SELECTORS.facebook.games);
+  } else if (platform === 'linkedin') {
+    if (currentConfig.blockLinkedinVideos) activeSelectors.push(...SELECTORS.linkedin.videos);
+    if (currentConfig.blockLinkedinGames) activeSelectors.push(...SELECTORS.linkedin.games);
+    if (currentConfig.blockLinkedinNews) activeSelectors.push(...SELECTORS.linkedin.news);
+  } else if (platform === 'x') {
+    if (currentConfig.blockXForYou) activeSelectors.push(...SELECTORS.x.forYou);
+    if (currentConfig.blockXTrends) activeSelectors.push(...SELECTORS.x.trends);
+    if (currentConfig.blockXExplore) activeSelectors.push(...SELECTORS.x.explore);
   }
 
   const newStyleContent = `
@@ -216,29 +293,29 @@ const injectStyles = () => {
   (document.head || document.documentElement).appendChild(style);
 };
 
-let pendingMetrics = { youtube: 0, instagram: 0, facebook: 0 };
+let pendingMetrics = { youtube: 0, instagram: 0, facebook: 0, linkedin: 0, x: 0 };
 let isFlushingMetrics = false;
 
 const flushMetrics = () => {
   if (isFlushingMetrics) return;
   const toFlush = { ...pendingMetrics };
-  const totalNew = toFlush.youtube + toFlush.instagram + toFlush.facebook;
+  const totalNew = toFlush.youtube + toFlush.instagram + toFlush.facebook + toFlush.linkedin + toFlush.x;
   if (totalNew === 0) return;
 
-  pendingMetrics = { youtube: 0, instagram: 0, facebook: 0 };
+  pendingMetrics = { youtube: 0, instagram: 0, facebook: 0, linkedin: 0, x: 0 };
   isFlushingMetrics = true;
 
   chrome.storage.local.get(['totalBlocked', 'statsByPlatform', 'statsHistory'], (result) => {
     const totalBlocked = (result.totalBlocked || 0) + totalNew;
 
-    const statsByPlatform = result.statsByPlatform || { youtube: 0, instagram: 0, facebook: 0 };
+    const statsByPlatform = result.statsByPlatform || { youtube: 0, instagram: 0, facebook: 0, linkedin: 0, x: 0 };
     const todayStr = new Date().toISOString().split('T')[0];
     const statsHistory = result.statsHistory || {};
     if (!statsHistory[todayStr]) {
-      statsHistory[todayStr] = { youtube: 0, instagram: 0, facebook: 0 };
+      statsHistory[todayStr] = { youtube: 0, instagram: 0, facebook: 0, linkedin: 0, x: 0 };
     }
 
-    ['youtube', 'instagram', 'facebook'].forEach((plat) => {
+    ['youtube', 'instagram', 'facebook', 'linkedin', 'x'].forEach((plat) => {
       if (toFlush[plat] > 0) {
         statsByPlatform[plat] = (statsByPlatform[plat] || 0) + toFlush[plat];
         statsHistory[todayStr][plat] = (statsHistory[todayStr][plat] || 0) + toFlush[plat];
@@ -247,7 +324,7 @@ const flushMetrics = () => {
 
     chrome.storage.local.set({ totalBlocked, statsByPlatform, statsHistory }, () => {
       isFlushingMetrics = false;
-      if (pendingMetrics.youtube + pendingMetrics.instagram + pendingMetrics.facebook > 0) {
+      if (pendingMetrics.youtube + pendingMetrics.instagram + pendingMetrics.facebook + pendingMetrics.linkedin + pendingMetrics.x > 0) {
         flushMetrics();
       }
     });
@@ -270,12 +347,22 @@ const processBlocks = () => {
   if (platform === 'youtube') {
     if (currentConfig.blockYoutubeShorts) selectorsToCount.push(...SELECTORS.youtube.shorts);
     if (currentConfig.blockYoutubeGames) selectorsToCount.push(...SELECTORS.youtube.games);
-  } else if (platform === 'instagram' && currentConfig.blockInstagramReels) {
-    selectorsToCount.push(...SELECTORS.instagram.reels);
+  } else if (platform === 'instagram') {
+    if (currentConfig.blockInstagramReels) selectorsToCount.push(...SELECTORS.instagram.reels);
+    if (currentConfig.blockInstagramExplore) selectorsToCount.push(...SELECTORS.instagram.explore);
+    if (currentConfig.blockInstagramStories) selectorsToCount.push(...SELECTORS.instagram.stories);
   } else if (platform === 'facebook') {
     if (currentConfig.blockFacebookReels) selectorsToCount.push(...SELECTORS.facebook.reels);
     if (currentConfig.blockFacebookStories) selectorsToCount.push(...SELECTORS.facebook.stories);
     if (currentConfig.blockFacebookGames) selectorsToCount.push(...SELECTORS.facebook.games);
+  } else if (platform === 'linkedin') {
+    if (currentConfig.blockLinkedinVideos) selectorsToCount.push(...SELECTORS.linkedin.videos);
+    if (currentConfig.blockLinkedinGames) selectorsToCount.push(...SELECTORS.linkedin.games);
+    if (currentConfig.blockLinkedinNews) selectorsToCount.push(...SELECTORS.linkedin.news);
+  } else if (platform === 'x') {
+    if (currentConfig.blockXForYou) selectorsToCount.push(...SELECTORS.x.forYou);
+    if (currentConfig.blockXTrends) selectorsToCount.push(...SELECTORS.x.trends);
+    if (currentConfig.blockXExplore) selectorsToCount.push(...SELECTORS.x.explore);
   }
 
   selectorsToCount.forEach(selector => {
@@ -309,10 +396,18 @@ const loadConfig = () => {
     'blockYoutubeComments',
     'blockYoutubeHome',
     'blockYoutubeVideoRec',
-    'blockInstagramReels', 
+    'blockInstagramReels',
+    'blockInstagramExplore',
+    'blockInstagramStories',
     'blockFacebookReels',
     'blockFacebookStories',
     'blockFacebookGames',
+    'blockLinkedinVideos',
+    'blockLinkedinGames',
+    'blockLinkedinNews',
+    'blockXForYou',
+    'blockXTrends',
+    'blockXExplore',
     'snoozeUntil',
     'focusScheduleEnabled',
     'focusStartTime',
@@ -329,9 +424,17 @@ const loadConfig = () => {
       blockYoutubeHome: result.blockYoutubeHome === true,
       blockYoutubeVideoRec: result.blockYoutubeVideoRec === true,
       blockInstagramReels: result.blockInstagramReels !== false,
+      blockInstagramExplore: result.blockInstagramExplore === true,
+      blockInstagramStories: result.blockInstagramStories === true,
       blockFacebookReels: result.blockFacebookReels !== false,
       blockFacebookStories: result.blockFacebookStories === true,
       blockFacebookGames: result.blockFacebookGames !== false,
+      blockLinkedinVideos: result.blockLinkedinVideos !== false,
+      blockLinkedinGames: result.blockLinkedinGames !== false,
+      blockLinkedinNews: result.blockLinkedinNews === true,
+      blockXForYou: result.blockXForYou === true,
+      blockXTrends: result.blockXTrends !== false,
+      blockXExplore: result.blockXExplore === true,
       snoozeUntil: result.snoozeUntil || null,
       focusScheduleEnabled: result.focusScheduleEnabled === true,
       focusStartTime: result.focusStartTime || "09:00",
@@ -379,9 +482,17 @@ chrome.storage.onChanged.addListener((changes) => {
   if (changes.blockYoutubeHome !== undefined) { currentConfig.blockYoutubeHome = changes.blockYoutubeHome.newValue; changed = true; }
   if (changes.blockYoutubeVideoRec !== undefined) { currentConfig.blockYoutubeVideoRec = changes.blockYoutubeVideoRec.newValue; changed = true; }
   if (changes.blockInstagramReels !== undefined) { currentConfig.blockInstagramReels = changes.blockInstagramReels.newValue; changed = true; }
+  if (changes.blockInstagramExplore !== undefined) { currentConfig.blockInstagramExplore = changes.blockInstagramExplore.newValue; changed = true; }
+  if (changes.blockInstagramStories !== undefined) { currentConfig.blockInstagramStories = changes.blockInstagramStories.newValue; changed = true; }
   if (changes.blockFacebookReels !== undefined) { currentConfig.blockFacebookReels = changes.blockFacebookReels.newValue; changed = true; }
   if (changes.blockFacebookStories !== undefined) { currentConfig.blockFacebookStories = changes.blockFacebookStories.newValue; changed = true; }
   if (changes.blockFacebookGames !== undefined) { currentConfig.blockFacebookGames = changes.blockFacebookGames.newValue; changed = true; }
+  if (changes.blockLinkedinVideos !== undefined) { currentConfig.blockLinkedinVideos = changes.blockLinkedinVideos.newValue; changed = true; }
+  if (changes.blockLinkedinGames !== undefined) { currentConfig.blockLinkedinGames = changes.blockLinkedinGames.newValue; changed = true; }
+  if (changes.blockLinkedinNews !== undefined) { currentConfig.blockLinkedinNews = changes.blockLinkedinNews.newValue; changed = true; }
+  if (changes.blockXForYou !== undefined) { currentConfig.blockXForYou = changes.blockXForYou.newValue; changed = true; }
+  if (changes.blockXTrends !== undefined) { currentConfig.blockXTrends = changes.blockXTrends.newValue; changed = true; }
+  if (changes.blockXExplore !== undefined) { currentConfig.blockXExplore = changes.blockXExplore.newValue; changed = true; }
   if (changes.snoozeUntil !== undefined) { currentConfig.snoozeUntil = changes.snoozeUntil.newValue; changed = true; }
   if (changes.focusScheduleEnabled !== undefined) { currentConfig.focusScheduleEnabled = changes.focusScheduleEnabled.newValue; changed = true; }
   if (changes.focusStartTime !== undefined) { currentConfig.focusStartTime = changes.focusStartTime.newValue; changed = true; }
@@ -862,7 +973,9 @@ const injectInstagramSidebarButton = () => {
   dropdown.appendChild(title);
 
   const toggles = [
-    { id: 'ig-reels', key: 'blockInstagramReels', label: 'Block Reels' }
+    { id: 'ig-reels', key: 'blockInstagramReels', i18nKey: 'blockReels', label: 'Block Reels' },
+    { id: 'ig-explore', key: 'blockInstagramExplore', i18nKey: 'blockExplore', label: 'Block Explore' },
+    { id: 'ig-stories', key: 'blockInstagramStories', i18nKey: 'blockStories', label: 'Block Stories' }
   ];
 
   toggles.forEach(t => {
@@ -870,7 +983,7 @@ const injectInstagramSidebarButton = () => {
     row.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 14px;';
 
     const lblSpan = document.createElement('span');
-    lblSpan.textContent = chrome.i18n ? chrome.i18n.getMessage('blockReels') || t.label : t.label;
+    lblSpan.textContent = chrome.i18n ? chrome.i18n.getMessage(t.i18nKey) || t.label : t.label;
 
     const toggleWrap = document.createElement('label');
     toggleWrap.style.cssText = 'position: relative; display: inline-block; width: 34px; height: 20px; cursor: pointer;';

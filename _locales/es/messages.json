@@ -139,5 +139,20 @@
     },
     "removeMenuWarning": {
         "message": "Puedes ocultar este menú en la configuración de la extensión."
+    },
+    "blockExplore": {
+        "message": "Bloquear Explorar"
+    },
+    "blockShortVideos": {
+        "message": "Bloquear Videos Cortos"
+    },
+    "blockNews": {
+        "message": "Bloquear Noticias y Tendencias"
+    },
+    "blockForYou": {
+        "message": "Bloquear Pestaña 'Para ti'"
+    },
+    "blockTrends": {
+        "message": "Bloquear Tendencias"
     }
 }

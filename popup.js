@@ -7,9 +7,17 @@ const CONFIG_KEYS = {
   'yt-home': 'blockYoutubeHome',
   'yt-video-rec': 'blockYoutubeVideoRec',
   'ig-reels': 'blockInstagramReels',
+  'ig-explore': 'blockInstagramExplore',
+  'ig-stories': 'blockInstagramStories',
   'fb-reels': 'blockFacebookReels',
   'fb-stories': 'blockFacebookStories',
   'fb-games': 'blockFacebookGames',
+  'li-videos': 'blockLinkedinVideos',
+  'li-games': 'blockLinkedinGames',
+  'li-news': 'blockLinkedinNews',
+  'x-foryou': 'blockXForYou',
+  'x-trends': 'blockXTrends',
+  'x-explore': 'blockXExplore',
   'show-extension-icon': 'showExtensionIcon'
 };
 
@@ -22,6 +30,24 @@ function formatTimeSaved(seconds) {
   const hours = Math.floor(minutes / 60);
   const remainingMinutes = minutes % 60;
   return `${hours}h ${remainingMinutes}m`;
+}
+
+function updateActiveCountBadges() {
+  document.querySelectorAll('.network-card').forEach(card => {
+    const platform = card.getAttribute('data-platform');
+    const checkboxes = card.querySelectorAll('.network-card-body input[type="checkbox"]');
+    if (!platform || checkboxes.length === 0) return;
+
+    let checkedCount = 0;
+    checkboxes.forEach(cb => {
+      if (cb.checked) checkedCount++;
+    });
+
+    const badge = card.querySelector(`.active-count-badge[data-badge-for="${platform}"]`);
+    if (badge) {
+      badge.textContent = `${checkedCount}/${checkboxes.length}`;
+    }
+  });
 }
 
 function updateSnoozeTimerDisplay(snoozeUntil) {
@@ -76,12 +102,26 @@ function updateUI() {
 
   chrome.storage.local.get(storageKeys, (result) => {
     // 3. Load Standard Toggles
+    const defaultTrueKeys = [
+      'blockYoutubeShorts',
+      'blockYoutubeGames',
+      'blockInstagramReels',
+      'blockFacebookReels',
+      'blockFacebookGames',
+      'blockLinkedinVideos',
+      'blockLinkedinGames',
+      'blockXTrends',
+      'showExtensionIcon'
+    ];
+
     Object.entries(CONFIG_KEYS).forEach(([elementId, storageKey]) => {
-      const defaultTrue = ['blockYoutubeShorts', 'blockYoutubeGames', 'blockInstagramReels', 'blockFacebookReels', 'blockFacebookGames', 'showExtensionIcon'].includes(storageKey);
+      const defaultTrue = defaultTrueKeys.includes(storageKey);
       const isEnabled = result[storageKey] !== undefined ? result[storageKey] : defaultTrue;
       const el = document.getElementById(elementId);
       if (el) el.checked = isEnabled;
     });
+
+    updateActiveCountBadges();
 
     // 4. Load Metrics
     const totalBlocked = result.totalBlocked || 0;
@@ -143,29 +183,39 @@ function updateThemeIcon(isDark) {
 }
 
 function renderAnalyticsDashboard(result) {
-  const statsByPlatform = result.statsByPlatform || { youtube: 0, instagram: 0, facebook: 0 };
-  const total = (statsByPlatform.youtube || 0) + (statsByPlatform.instagram || 0) + (statsByPlatform.facebook || 0);
+  const statsByPlatform = result.statsByPlatform || { youtube: 0, instagram: 0, facebook: 0, linkedin: 0, x: 0 };
+  const ytCount = statsByPlatform.youtube || 0;
+  const igCount = statsByPlatform.instagram || 0;
+  const fbCount = statsByPlatform.facebook || 0;
+  const liCount = statsByPlatform.linkedin || 0;
+  const xCount = statsByPlatform.x || 0;
+
+  const total = ytCount + igCount + fbCount + liCount + xCount;
 
   const countYtEl = document.getElementById('stat-count-yt');
   const countIgEl = document.getElementById('stat-count-ig');
   const countFbEl = document.getElementById('stat-count-fb');
+  const countLiEl = document.getElementById('stat-count-li');
+  const countXEl = document.getElementById('stat-count-x');
 
   const barYt = document.getElementById('bar-yt');
   const barIg = document.getElementById('bar-ig');
   const barFb = document.getElementById('bar-fb');
-
-  const ytCount = statsByPlatform.youtube || 0;
-  const igCount = statsByPlatform.instagram || 0;
-  const fbCount = statsByPlatform.facebook || 0;
+  const barLi = document.getElementById('bar-li');
+  const barX = document.getElementById('bar-x');
 
   if (countYtEl) countYtEl.textContent = ytCount.toLocaleString();
   if (countIgEl) countIgEl.textContent = igCount.toLocaleString();
   if (countFbEl) countFbEl.textContent = fbCount.toLocaleString();
+  if (countLiEl) countLiEl.textContent = liCount.toLocaleString();
+  if (countXEl) countXEl.textContent = xCount.toLocaleString();
 
   const maxVal = Math.max(total, 1);
   if (barYt) barYt.style.width = `${Math.round((ytCount / maxVal) * 100)}%`;
   if (barIg) barIg.style.width = `${Math.round((igCount / maxVal) * 100)}%`;
   if (barFb) barFb.style.width = `${Math.round((fbCount / maxVal) * 100)}%`;
+  if (barLi) barLi.style.width = `${Math.round((liCount / maxVal) * 100)}%`;
+  if (barX) barX.style.width = `${Math.round((xCount / maxVal) * 100)}%`;
 
   // Render History List (last 7 days)
   const historyContainer = document.getElementById('history-container');
@@ -179,7 +229,7 @@ function renderAnalyticsDashboard(result) {
     } else {
       dates.forEach(dateStr => {
         const dayStats = statsHistory[dateStr];
-        const dayTotal = (dayStats.youtube || 0) + (dayStats.instagram || 0) + (dayStats.facebook || 0);
+        const dayTotal = (dayStats.youtube || 0) + (dayStats.instagram || 0) + (dayStats.facebook || 0) + (dayStats.linkedin || 0) + (dayStats.x || 0);
 
         const row = document.createElement('div');
         row.className = 'history-row';
@@ -194,12 +244,31 @@ function renderAnalyticsDashboard(result) {
 }
 
 function setupEventListeners() {
+  // Accordion header toggle
+  document.querySelectorAll('.network-card-header').forEach(header => {
+    header.addEventListener('click', () => {
+      const card = header.closest('.network-card');
+      if (!card) return;
+      const isOpen = card.classList.contains('open');
+
+      // Close other accordions to keep Home compact
+      document.querySelectorAll('.network-card.open').forEach(otherCard => {
+        if (otherCard !== card) {
+          otherCard.classList.remove('open');
+        }
+      });
+
+      card.classList.toggle('open', !isOpen);
+    });
+  });
+
   // Toggle standard switches
   Object.entries(CONFIG_KEYS).forEach(([elementId, storageKey]) => {
     const el = document.getElementById(elementId);
     if (el) {
       el.addEventListener('change', (e) => {
         chrome.storage.local.set({ [storageKey]: e.target.checked });
+        updateActiveCountBadges();
       });
     }
   });
@@ -359,9 +428,17 @@ function applyI18nTranslations() {
   setI18nText('lbl-yt-home', 'homeRecs');
   setI18nText('lbl-yt-video-rec', 'videoRecs');
   setI18nText('lbl-ig-reels', 'blockReels');
+  setI18nText('lbl-ig-explore', 'blockExplore');
+  setI18nText('lbl-ig-stories', 'blockStories');
   setI18nText('lbl-fb-reels', 'blockReels');
   setI18nText('lbl-fb-stories', 'blockStories');
   setI18nText('lbl-fb-games', 'blockGames');
+  setI18nText('lbl-li-videos', 'blockShortVideos');
+  setI18nText('lbl-li-games', 'blockGames');
+  setI18nText('lbl-li-news', 'blockNews');
+  setI18nText('lbl-x-foryou', 'blockForYou');
+  setI18nText('lbl-x-trends', 'blockTrends');
+  setI18nText('lbl-x-explore', 'blockExplore');
 
   // Snooze buttons
   const snoozeMap = {
